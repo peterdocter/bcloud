@@ -1,4 +1,3 @@
-
 # Copyright (C) 2014-2015 LiuLang <gsushzhsosgsu@gmail.com>
 # Use of this source code is governed by GPLv3 license that can be found
 # in http://www.gnu.org/licenses/gpl-3.0.html
@@ -13,7 +12,6 @@ from gi.repository import Gio
 from gi.repository import GLib
 from gi.repository import GObject
 from gi.repository import Gtk
-from gi.repository import Notify
 
 from bcloud import Config
 Config.check_first()
@@ -481,30 +479,3 @@ class App:
     def get_default_color(self):
         context = self.window.get_style_context()
         return context.get_color(Gtk.StateFlags.NORMAL)
-
-    # Open API
-    def update_clipboard(self, text):
-        '''将文本复制到系统剪贴板里面'''
-        clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
-        clipboard.set_text(text, -1)
-        self.toast(_('{0} copied to clipboard'.format(text)))
-
-    def init_notify(self):
-        self.notify = None
-        if self.profile['use-notify']:
-            status = Notify.init(Config.APPNAME)
-            if not status:
-                return
-            self.notify = Notify.Notification.new(Config.APPNAME, '',
-                                                  Config.NAME)
-
-    # Open API
-    def toast(self, text):
-        '''在用户界面显示一个消息通知.
-
-        可以使用系统提供的Notification工具, 也可以在窗口的最下方滚动弹出
-        这个消息
-        '''
-        if self.notify:
-            self.notify.update(Config.APPNAME, text, Config.NAME)
-            self.notify.show()

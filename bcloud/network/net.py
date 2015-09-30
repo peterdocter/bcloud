@@ -93,16 +93,15 @@ def urlopen(url, headers={}, data=None, retries=RETRIES, timeout=TIMEOUT):
         try:
             req = opener.open(url, data=data, timeout=timeout)
             encoding = req.headers.get('Content-encoding')
+            print("encoding:", encoding)
             req.data = req.read()
+            print("req.data:", req.data)
             if encoding == 'gzip':
                 req.data = gzip.decompress(req.data)
             elif encoding == 'deflate':
                 req.data = zlib.decompress(req.data, -zlib.MAX_WBITS)
             return req
-        except OSError:
-            logger.error(traceback.format_exc())
-            
-        except:
+        except Exception:
             logger.error(traceback.format_exc())
             
     return None
