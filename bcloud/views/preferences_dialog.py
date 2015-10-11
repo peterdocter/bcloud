@@ -19,10 +19,10 @@ class PreferencesDialog(Gtk.Dialog):
         self.set_default_size(480, 360)
         self.set_border_width(10)
 
-        self._initUI()
+        self._init_ui()
 
-    def _initUI(self):
-        settings = Settings.get_instance()
+    def _init_ui(self):
+        settings = Settings()
         box = self.get_content_area()
 
         notebook = Gtk.Notebook()
@@ -283,14 +283,12 @@ class PreferencesDialog(Gtk.Dialog):
     def on_save_dir_updated(self, file_button):
         dir_name = file_button.get_filename()
         if dir_name:
-            settings = Settings.get_instance()
-            settings.props.save_dir = dir_name
+            Settings().props.save_dir = dir_name
 
     def on_sync_local_dir_updated(self, file_button):
         dir_name = file_button.get_filename()
         if dir_name:
-            settings = Settings.get_instance()
-            settings.props.sync_local_dir = dir_name
+            Settings().props.sync_local_dir = dir_name
 
     def on_sync_remote_dir_button_clicked(self, button):
         folder_dialog = FolderBrowserDialog()
@@ -301,5 +299,4 @@ class PreferencesDialog(Gtk.Dialog):
         dir_name = folder_dialog.get_path()
         folder_dialog.destroy()
         button.set_label(dir_name)
-        settings = Settings.get_instance()
-        settings.props.sync_remote_dir = dir_name
+        Settings().props.sync_remote_dir = dir_name
