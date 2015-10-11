@@ -48,11 +48,24 @@ class Settings(GObject.GObject):
     sync_remote_dir = GObject.property(type=str, default="")
 
     username = GObject.property(type=str, default="")
+    signed_in = GObject.property(type=bool, default=False)
+
+    window_width = GObject.property(type=int, default=800)
+    window_height = GObject.property(type=int, default=600)
+
+    # Page mode
+    HomePage = GObject.property(type=int, minimum=0, maximum=1, default=0)
+    PicturePage = GObject.property(type=int, minimum=0, maximum=1, default=0)
+    DocPage = GObject.property(type=int, minimum=0, maximum=1, default=0)
+    VideoPage = GObject.property(type=int, minimum=0, maximum=1, default=0)
+    BTPage = GObject.property(type=int, minimum=0, maximum=1, default=0)
+    MusicPage = GObject.property(type=int, minimum=0, maximum=1, default=0)
+    OtherPage = GObject.property(type=int, minimum=0, maximum=1, default=0)
 
     def reset(self):
         """Reset settings to default value and clear username/password."""
         for prop in self.props:
-            setattr(self, prop.name, prop.default_value)
+            self.set_property(prop.name, prop.default_value)
 
     def read(self):
         """Read settings from disk."""
@@ -63,14 +76,15 @@ class Settings(GObject.GObject):
         with open(path) as fh:
             conf = json.load(fh)
         for key in conf:
-            setattr(self, key, conf[key])
+            self.set_property(key, conf[key])
 
     def write(self):
         """Write settings to disk."""
+        print("[Settings.write]")
         path = os.path.join(self.tmp_path(), _kAuthConf)
         conf = {}
         for prop in self.props:
-            conf[prop.name] = getattr(self, prop.name)
+            conf[prop.name] = self.get_property(prop.name)
         with open(path, "w") as fh:
             json.dump(conf, fh)
 

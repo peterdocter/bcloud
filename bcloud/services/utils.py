@@ -2,17 +2,6 @@
 # Use of this source code is governed by General Public License that
 # can be found in the LICENSE file.
 
-from gi.repository import Gtk
-
-from ..base.i18n import _
-from ..service.notify import notify
-
-def copyToClipboard(text):
-    """Copy text to system clipboard."""
-    clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
-    clipboard.set_text(text, -1)
-    notify(_('{0} copied to clipboard').format(text))
-
 import base64
 import datetime
 import hashlib
@@ -132,20 +121,6 @@ def list_remove_by_index(l, index):
         l = l[0:index] + l[index+1:]
 
     return l
-
-def uri_to_path(uri):
-    if not uri or len(uri) < 7:
-        return ''
-    return urllib.parse.unquote(uri[7:])
-
-def uris_to_paths(uris):
-    '''将一串URI地址转为绝对路径, 用于处理桌面程序中的文件拖放'''
-    source_paths = []
-    for uri in uris:
-        source_path = uri_to_path(uri)
-        if source_path:
-            source_paths.append(source_path)
-    return source_paths
 
 def natsort(string):
     '''按照语言里的意义对字符串进行排序.

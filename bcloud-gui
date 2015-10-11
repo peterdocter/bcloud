@@ -7,10 +7,10 @@
 import sys
 
 from bcloud.base import log
-from bcloud.views.application import Application
+from bcloud.controllers.application import Application
 
 def main():
-    #log.redirectStdout()
+    #log.redirect_stdout()
     app = Application()
     app.run(sys.argv)
 

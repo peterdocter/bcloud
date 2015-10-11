@@ -2,23 +2,24 @@
 # Use of this source code is governed by General Public License that
 # can be found in the LICENSE file.
 
+import gi
+gi.require_version("Gtk", "3.0")
 from gi.repository import Gio
 from gi.repository import GLib
 from gi.repository import Gtk
 
 from ..base import const
 from ..base.i18n import _
-from .about_dialog import AboutDialog
-from .main_window import MainWindow
-from .preferences_dialog import PreferencesDialog
-
-_kDbusName = "org.liulang.bcloud"
+from ..views.about_dialog import AboutDialog
+from ..views.main_window import MainWindow
+from ..views.preferences_dialog import PreferencesDialog
+from .signal_manager import SignalManager
 
 class Application(Gtk.Application):
 
     def __init__(self):
         super().__init__()
-        self.set_application_id(_kDbusName)
+        self.set_application_id(const.kDbusName)
 
     def do_startup(self):
         GLib.set_application_name(const.kAppName)
@@ -43,8 +44,11 @@ class Application(Gtk.Application):
         about_action.connect("activate", self.on_about_action_activated)
         self.add_action(about_action)
         quit_action = Gio.SimpleAction.new("quit", None)
-        quit_action.connect("activate", lambda *args: self.quit())
+        quit_action.connect("activate",
+                            lambda *args: SignalManager().emit("app-quit"))
         self.add_action(quit_action)
+
+        SignalManager().connect("app-quit", lambda *args: self.quit())
 
     def do_activate(self):
         self.main_window.show_all()

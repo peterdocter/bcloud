@@ -8,8 +8,11 @@ from ..base import const
 
 # Global notitification object.
 _notification_obj = None
+
 def init(notify_enabled):
+    """Init notify when a new user session is started."""
     if not notify_enabled:
+        _notification_obj = None
         return
     success = Notify.init(const.kAppName)
     if not success:

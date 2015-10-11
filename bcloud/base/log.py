@@ -17,7 +17,7 @@ _kLogLevel = logging.INFO
 _kFileLog = os.path.join(const.kConfigDir, "bcloud.log")
 _kConsoleLog = os.path.join(const.kConfigDir, "bcloud-console.log")
 
-def _initLogger(log_file, log_level, maxBytes, backupCount):
+def _init_logger(log_file, log_level, maxBytes, backupCount):
     looger = logging.getLogger(const.kAppName)
     file_handler = logging.handlers.RotatingFileHandler(
             log_file, maxBytes=maxBytes,
@@ -29,9 +29,9 @@ def _initLogger(log_file, log_level, maxBytes, backupCount):
     return looger
 
 # Global logging instance.
-logger = _initLogger(_kFileLog, _kLogLevel, _kLogFileMaxSize, _kBackupCount)
+logger = _init_logger(_kFileLog, _kLogLevel, _kLogFileMaxSize, _kBackupCount)
 
-def redirectStdout():
+def redirect_stdout():
     """Redirect stdout and stderr to file."""
     if (os.path.exists(_kConsoleLog) and
             time.time() - os.stat(_kConsoleLog).st_ctime > _kLogInterval):

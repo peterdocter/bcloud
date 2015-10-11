@@ -4,11 +4,11 @@
 
 def single_instance(cls):
     """Make this class singleton."""
-    cls._instance = None
-
-    def get_instance():
-        if not cls._instance:
-            cls._instance = cls()
+    def __new__(cls, *args, **kwargs):
+        if not hasattr(cls, "_instance"):
+            # TODO(xushaohua): support multiple inheritence.
+            super_cls = cls.mro()[1]
+            cls._instance = super_cls.__new__(cls, *args, **kwargs)
         return cls._instance
-    cls.get_instance = get_instance
+    cls.__new__ = __new__
     return cls
