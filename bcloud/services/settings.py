@@ -48,6 +48,8 @@ class Settings(GObject.GObject):
     sync_remote_dir = GObject.property(type=str, default="")
 
     username = GObject.property(type=str, default="")
+    remember_password = GObject.property(type=bool, default=True)
+    auto_signin = GObject.property(type=bool, default=True)
     signed_in = GObject.property(type=bool, default=False)
 
     window_width = GObject.property(type=int, default=800)
@@ -91,6 +93,8 @@ class Settings(GObject.GObject):
     @property
     def username_hash(self):
         """Get hashed username."""
+        if not self.username:
+            raise ValueError("[Settings] username is empty")
         return string_hash.md5(self.username)
 
     @property
