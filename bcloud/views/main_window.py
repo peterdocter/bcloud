@@ -82,10 +82,10 @@ class MainWindow(Gtk.ApplicationWindow):
         left_box.pack_end(self.img_avatar, False, False, 5)
 
         self.notebook = Gtk.Notebook()
-        self.notebook.props.show_tabs = False
+        #self.notebook.props.show_tabs = False
         paned.add2(self.notebook)
 
-        self.init_notebooks()
+        self.init_notebook()
 
         # Support drop files.
         self.drag_dest_set(Gtk.DestDefaults.ALL, _kDropTargetList,
@@ -103,16 +103,17 @@ class MainWindow(Gtk.ApplicationWindow):
         SignalManager().connect("toggle-main-window-visibility",
                                 lambda obj: self.toggle_visibility())
 
-    def init_notebooks(self):
+    def init_notebook(self):
         def append_page(page):
             self.notebook.append_page(page, Gtk.Label.new(page.disname))
             self.nav_liststore.append([page.icon_name, page.disname,
                                        page.tooltip, self.default_color])
-        #self.default_color = self.get_default_color()
-        self.nav_liststore.clear()
-        children = self.notebook.get_children()
-        for child in children:
-            self.notebook.remove(child)
+
+        self.default_color = _kDarkColor
+        #self.nav_liststore.clear()
+        #children = self.notebook.get_children()
+        #for child in children:
+        #    self.notebook.remove(child)
         self.home_page = HomePage(self)
         append_page(self.home_page)
         self.picture_page = PicturePage(self)
@@ -138,6 +139,7 @@ class MainWindow(Gtk.ApplicationWindow):
 #        self.upload_page = UploadPage(self)
 #        append_page(self.upload_page)
 #
+        self.notebook.connect('switch-page', self.on_notebook_switched)
         self.notebook.show_all()
 
     def do_activate_default(self):

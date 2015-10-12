@@ -13,7 +13,9 @@ from ..base.i18n import _
 from ..views.about_dialog import AboutDialog
 from ..views.main_window import MainWindow
 from ..views.preferences_dialog import PreferencesDialog
+from ..views.signin_dialog import SigninDialog
 from .signal_manager import SignalManager
+from ..services.settings import Settings
 
 class Application(Gtk.Application):
 
@@ -52,6 +54,7 @@ class Application(Gtk.Application):
 
     def do_activate(self):
         self.main_window.show_all()
+        self.show_signin_dialog(True)
 
     def do_shutdown(self):
         Gtk.Application.do_shutdown(self)
@@ -69,3 +72,13 @@ class Application(Gtk.Application):
         dialog = AboutDialog(self.main_window)
         dialog.run()
         dialog.destroy()
+
+    def show_signin_dialog(self, auto_signin):
+        Settings().reset()
+        return
+        dialog = SigninDialog(self.main_window, auto_signin)
+        dialog.run()
+        dialog.destroy()
+
+        if Settings().signed_in:
+            self.main_window.init_notebook()

@@ -56,7 +56,6 @@ class IconWindow(Gtk.ScrolledWindow):
     def __init__(self, parent):
         super().__init__()
         self.parent = parent
-        print("icon window")
 
         # pixbuf, name, path, tooltip, size, humansize,
         # isdir, mtime, human mtime, type, pcs_file

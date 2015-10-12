@@ -11,7 +11,7 @@ from ..base import const
 from ..base import decorators
 from ..base.log import logger
 
-_kConfFile = os.path.join(const.kConfDir, "conf.json")
+_kConfFile = os.path.join(const.kConfigDir, "conf.json")
 
 @decorators.single_instance
 class Profiles:
