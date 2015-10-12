@@ -7,21 +7,21 @@ from gi.repository import Gtk
 
 from ..base import const
 from ..base.i18n import _
-from ..controllers.signal_manager import SignalManager
-from ..services.settings import Settings
+from ..controllers.signal_manager import signal_manager
+from ..services.settings import settings
 from .category_page import *
 from .home_page import HomePage
 from . import util
 from .util import TargetInfo, TargetType
 
-_kDropTargets = (
+kDropTargets = (
     (TargetType.kUriList, Gtk.TargetFlags.OTHER_APP, TargetInfo.kUriList),
 )
-_kDropTargetList = [Gtk.TargetEntry.new(*t) for t in _kDropTargets]
+kDropTargetList = [Gtk.TargetEntry.new(*t) for t in kDropTargets]
 
-_kIconCol, _kNameCol, _kTooltipCol, _kColorCol = 0, 1, 2, 3
-_kDarkColor  = Gdk.RGBA(0.9, 0.9, 0.9, 1)
-_kLightColor = Gdk.RGBA(0.1, 0.1, 0.1, 1)
+kIconCol, kNameCol, kTooltipCol, kColorCol = 0, 1, 2, 3
+kDarkColor  = Gdk.RGBA(0.9, 0.9, 0.9, 1)
+kLightColor = Gdk.RGBA(0.1, 0.1, 0.1, 1)
 
 class MainWindow(Gtk.ApplicationWindow):
 
@@ -29,15 +29,15 @@ class MainWindow(Gtk.ApplicationWindow):
         Gtk.Window.__init__(self, application=app)
 
         self._init_ui()
+        self._init_connect()
 
     def _init_ui(self):
-        settings = Settings()
-        self.set_default_size(Settings().window_width, Settings().window_height)
+        self.set_default_size(settings.window_width, settings.window_height)
         self.set_default_icon_name(const.kAppName)
         self.props.window_position = Gtk.WindowPosition.CENTER
         self.props.hide_titlebar_when_maximized = True
 
-        self.default_color = _kDarkColor
+        self.default_color = kDarkColor
 
         paned = Gtk.Paned()
         self.add(paned)
@@ -53,23 +53,20 @@ class MainWindow(Gtk.ApplicationWindow):
 
         # icon_name, disname, tooltip, color
         self.nav_liststore = Gtk.ListStore(str, str, str, Gdk.RGBA)
-        nav_treeview = Gtk.TreeView(model=self.nav_liststore)
-        nav_treeview.get_style_context().add_class(Gtk.STYLE_CLASS_SIDEBAR)
-        self.nav_selection = nav_treeview.get_selection()
-        nav_treeview.props.headers_visible = False
-        nav_treeview.set_tooltip_column(_kTooltipCol)
+        self.nav_treeview = Gtk.TreeView(model=self.nav_liststore)
+        self.nav_treeview.get_style_context().add_class(Gtk.STYLE_CLASS_SIDEBAR)
+        self.nav_treeview.props.headers_visible = False
+        self.nav_treeview.set_tooltip_column(kTooltipCol)
         icon_cell = Gtk.CellRendererPixbuf()
         icon_cell.props.xalign = 1
-        icon_col = Gtk.TreeViewColumn("Icon", icon_cell, icon_name=_kIconCol)
+        icon_col = Gtk.TreeViewColumn("Icon", icon_cell, icon_name=kIconCol)
         icon_col.props.fixed_width = 40
-        nav_treeview.append_column(icon_col)
+        self.nav_treeview.append_column(icon_col)
         name_cell = Gtk.CellRendererText()
-        name_col = Gtk.TreeViewColumn("Places", name_cell, text=_kNameCol,
-                                      foreground_rgba=_kColorCol)
-        nav_treeview.append_column(name_col)
-        nav_selection = nav_treeview.get_selection()
-        nav_selection.connect("changed", self.on_nav_selection_changed)
-        nav_window.add(nav_treeview)
+        name_col = Gtk.TreeViewColumn("Places", name_cell, text=kNameCol,
+                                      foreground_rgba=kColorCol)
+        self.nav_treeview.append_column(name_col)
+        nav_window.add(self.nav_treeview)
 
         self.progressbar = Gtk.ProgressBar()
         left_box.pack_end(self.progressbar, False, False, 0)
@@ -82,13 +79,13 @@ class MainWindow(Gtk.ApplicationWindow):
         left_box.pack_end(self.img_avatar, False, False, 5)
 
         self.notebook = Gtk.Notebook()
-        #self.notebook.props.show_tabs = False
+        self.notebook.props.show_tabs = False
         paned.add2(self.notebook)
 
         self.init_notebook()
 
         # Support drop files.
-        self.drag_dest_set(Gtk.DestDefaults.ALL, _kDropTargetList,
+        self.drag_dest_set(Gtk.DestDefaults.ALL, kDropTargetList,
                            Gdk.DragAction.COPY)
 
         # Add accelerator
@@ -98,9 +95,14 @@ class MainWindow(Gtk.ApplicationWindow):
         self.add_accelerator("activate-default", self.accel_group, key, mod,
                              Gtk.AccelFlags.VISIBLE)
 
-        SignalManager().connect("reload-current-page", self.reload_current_page)
-        SignalManager().connect("show-main-window", lambda obj: self.present())
-        SignalManager().connect("toggle-main-window-visibility",
+    def _init_connect(self):
+        nav_selection = self.nav_treeview.get_selection()
+        nav_selection.connect("changed", self.on_nav_selection_changed)
+        self.notebook.connect('switch-page', self.on_notebook_switched)
+
+        signal_manager.connect("reload-current-page", self.reload_current_page)
+        signal_manager.connect("show-main-window", lambda obj: self.present())
+        signal_manager.connect("toggle-main-window-visibility",
                                 lambda obj: self.toggle_visibility())
 
     def init_notebook(self):
@@ -109,11 +111,10 @@ class MainWindow(Gtk.ApplicationWindow):
             self.nav_liststore.append([page.icon_name, page.disname,
                                        page.tooltip, self.default_color])
 
-        self.default_color = _kDarkColor
-        #self.nav_liststore.clear()
-        #children = self.notebook.get_children()
-        #for child in children:
-        #    self.notebook.remove(child)
+        self.nav_liststore.clear()
+        children = self.notebook.get_children()
+        for child in children:
+            self.notebook.remove(child)
         self.home_page = HomePage(self)
         append_page(self.home_page)
         self.picture_page = PicturePage(self)
@@ -139,7 +140,6 @@ class MainWindow(Gtk.ApplicationWindow):
 #        self.upload_page = UploadPage(self)
 #        append_page(self.upload_page)
 #
-        self.notebook.connect('switch-page', self.on_notebook_switched)
         self.notebook.show_all()
 
     def do_activate_default(self):
@@ -152,24 +152,25 @@ class MainWindow(Gtk.ApplicationWindow):
             self.present()
 
     def do_check_resize(self):
-        Settings().window_width, Settings().window_height = self.get_size()
+        settings.window_width, settings.window_height = self.get_size()
+        return Gtk.Window.do_check_resize(self)
 
     def do_delete_event(self, event):
-        if Settings().use_status_icon:
+        if settings.use_status_icon:
             self.hide()
         else:
-            SignalManager().emit("app-quit")
-
+            signal_manager.emit("app-quit")
+#
     def do_drag_data_received(self, drag_context, x, y, data, info, time):
         """Drag a file/folder to main window, opens a file chooser dialog."""
-        if not Settings().signed_in:
+        if not settings.signed_in:
             return
 
         if info == TargetInfo.kUriList:
             uris = data.get_uris()
             source_paths = util.uris_to_paths(uris)
             if source_paths:
-                SignalManager().emit("upload-files", source_paths, "/")
+                signal_manager.emit("upload-files", source_paths, "/")
 
     def on_nav_selection_changed(self, nav_selection):
         model, tree_iter = nav_selection.get_selected()
@@ -204,9 +205,9 @@ class MainWindow(Gtk.ApplicationWindow):
         settings = Gtk.Settings.get_default()
         settings.props.gtk_application_prefer_dark_theme = prefer_dark_theme 
         if prefer_dark_theme:
-            self.default_color = _kDarkColor
+            self.default_color = kDarkColor
         else:
-            self.default_color = _kLightColor
-        if Settings().signed_in:
+            self.default_color = kLightColor
+        if settings.signed_in:
             for row in self.nav_liststore:
-                row[_kColorCol] = self.default_color
+                row[kColorCol] = self.default_color

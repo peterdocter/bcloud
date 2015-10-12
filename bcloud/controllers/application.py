@@ -13,9 +13,8 @@ from ..base.i18n import _
 from ..views.about_dialog import AboutDialog
 from ..views.main_window import MainWindow
 from ..views.preferences_dialog import PreferencesDialog
-from ..views.signin_dialog import SigninDialog
-from .signal_manager import SignalManager
-from ..services.settings import Settings
+from .signal_manager import signal_manager
+from ..services.settings import settings
 
 class Application(Gtk.Application):
 
@@ -47,14 +46,14 @@ class Application(Gtk.Application):
         self.add_action(about_action)
         quit_action = Gio.SimpleAction.new("quit", None)
         quit_action.connect("activate",
-                            lambda *args: SignalManager().emit("app-quit"))
+                            lambda *args: signal_manager.emit("app-quit"))
         self.add_action(quit_action)
 
-        SignalManager().connect("app-quit", lambda *args: self.quit())
+        signal_manager.connect("app-quit", lambda *args: self.quit())
 
     def do_activate(self):
         self.main_window.show_all()
-        self.show_signin_dialog(True)
+        #self.show_signin_dialog(True)
 
     def do_shutdown(self):
         Gtk.Application.do_shutdown(self)
@@ -74,11 +73,10 @@ class Application(Gtk.Application):
         dialog.destroy()
 
     def show_signin_dialog(self, auto_signin):
-        Settings().reset()
-        return
+        settings.reset()
         dialog = SigninDialog(self.main_window, auto_signin)
         dialog.run()
         dialog.destroy()
 
-        if Settings().signed_in:
+        if settings.signed_in:
             self.main_window.init_notebook()

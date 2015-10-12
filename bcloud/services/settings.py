@@ -12,11 +12,8 @@ NOTE: |password| is not kept in settings, it is kept in keyring if available and
 
 from gi.repository import GObject
 
-from ..base import decorators
-
 _kAuthConf = "auth.json"
 
-@decorators.single_instance
 class Settings(GObject.GObject):
 
     use_streaming = GObject.property(type=bool, default=True)
@@ -119,3 +116,5 @@ class Settings(GObject.GObject):
         if not os.path.exists(path):
             os.makedirs(path, exist_ok=True)
         return path
+
+settings = Settings()

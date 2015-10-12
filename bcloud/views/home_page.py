@@ -16,13 +16,13 @@ from . import util
 from .util import TargetInfo, TargetType, ViewMode
 
 # 用于处理拖放上传
-_kDropTargets = (
+kDropTargets = (
     (TargetType.kUriList, Gtk.TargetFlags.OTHER_APP, TargetInfo.kUriList),
 )
-_kDropTargetList = [Gtk.TargetEntry.new(*t) for t in _kDropTargets]
+kDropTargetList = [Gtk.TargetEntry.new(*t) for t in kDropTargets]
 
-_kMouseBackButton = 8
-_kMouseForwardButton = 9
+kMouseBackButton = 8
+kMouseForwardButton = 9
 
 class PathBox(Gtk.Box):
     """路径栏"""
@@ -102,9 +102,9 @@ class PathBox(Gtk.Box):
         self.parent.load(button.abspath, is_user=True)
 
     def on_button_press(self, window, event):
-        if event.button == _kMouseBackButton:
+        if event.button == kMouseBackButton:
             self.history_navigate(True)
-        elif event.button == _kMouseForwardButton:
+        elif event.button == kMouseForwardButton:
             self.history_navigate(False)
         else:
             return
@@ -171,7 +171,7 @@ class HomePage(Gtk.Box):
         super().__init__(orientation=Gtk.Orientation.VERTICAL)
         self.parent = parent
 
-        self.drag_dest_set(Gtk.DestDefaults.ALL, _kDropTargetList,
+        self.drag_dest_set(Gtk.DestDefaults.ALL, kDropTargetList,
                            Gdk.DragAction.COPY)
 
         self._init_ui()
