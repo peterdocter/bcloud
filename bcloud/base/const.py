@@ -25,4 +25,3 @@ kIconPath = os.path.join(kPrefix, kAppName, "icons")
 kColorSchema = os.path.join(kPrefix, kAppName, "color-schema.json")
 kCacheDir = os.path.join(kHomeDir, ".cache", kAppName)
 kConfigDir = os.path.join(kHomeDir, ".config", kAppName)
-

@@ -14,7 +14,7 @@ from gi.repository import GObject
 
 from ..base import decorators
 
-_kAuthConf = "auth.json"
+kAuthConf = "auth.json"
 
 @decorators.single_instance
 class Settings(GObject.GObject):
@@ -71,7 +71,7 @@ class Settings(GObject.GObject):
 
     def read(self):
         """Read settings from disk."""
-        path = os.path.join(self.tmp_path(), _kAuthConf)
+        path = os.path.join(self.tmp_path(), kAuthConf)
         if not os.path.exists(path):
             self.reset()
             return
@@ -82,8 +82,7 @@ class Settings(GObject.GObject):
 
     def write(self):
         """Write settings to disk."""
-        print("[Settings.write]")
-        path = os.path.join(self.tmp_path(), _kAuthConf)
+        path = os.path.join(self.tmp_path(), kAuthConf)
         conf = {}
         for prop in self.props:
             conf[prop.name] = self.get_property(prop.name)

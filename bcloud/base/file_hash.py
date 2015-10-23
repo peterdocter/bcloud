@@ -13,84 +13,84 @@ _kChunkSize = 2 ** 20
 
 def crc(path):
     _crc = 0
-    fh = open(path, "rb")
+    file_stream = open(path, "rb")
     while True:
-        chunk = fh.read(_kChunkSize)
+        chunk = file_stream.read(_kChunkSize)
         if not chunk:
             break
         _crc = zlib.crc32(chunk, _crc)
-    fh.close()
+    file_stream.close()
     return "%X" % (_crc & 0xFFFFFFFF)
 
 def md5(path, start=0, stop=-1):
     _md5 = hashlib.md5()
-    fh = open(path, "rb")
+    file_stream = open(path, "rb")
     if start > 0:
-        fh.seek(start)
+        file_stream.seek(start)
     if stop == -1:
         stop = os.path.getsize(path)
     pos = start
     while pos < stop:
         size = min(_kChunkSize, stop - pos)
-        chunk = fh.read(size)
+        chunk = file_stream.read(size)
         if not chunk:
             break
         pos += len(chunk)
         _md5.update(chunk)
-    fh.close()
+    file_stream.close()
     return _md5.hexdigest()
 
 def sha1(path):
     _sha1 = hashlib.sha1()
-    fh = open(path, "rb")
+    file_stream = open(path, "rb")
     while True:
-        chunk = fh.read(_kChunkSize)
+        chunk = file_stream.read(_kChunkSize)
         if not chunk:
             break
         _sha1.update(chunk)
-    fh.close()
+    file_stream.close()
     return _sha1.hexdigest()
 
 def sha224(path):
     _sha224 = hashlib.sha224()
-    fh = open(path, "rb")
+    file_stream = open(path, "rb")
     while True:
-        chunk = fh.read(_kChunkSize)
+        chunk = file_stream.read(_kChunkSize)
         if not chunk:
             break
         _sha224.update(chunk)
-    fh.close()
+    file_stream.close()
     return _sha224.hexdigest()
 
 def sha256(path):
     _sha256 = hashlib.sha256()
-    fh = open(path, "rb")
+    file_stream = open(path, "rb")
     while True:
-        chunk = fh.read(_kChunkSize)
+        chunk = file_stream.read(_kChunkSize)
         if not chunk:
             break
         _sha256.update(chunk)
-    fh.close()
+    file_stream.close()
     return _sha256.hexdigest()
 
 def sha384(path):
     _sha384 = hashlib.sha384()
-    fh = open(path, "rb")
+    file_stream = open(path, "rb")
     while True:
-        chunk = fh.read(_kChunkSize)
+        chunk = file_stream.read(_kChunkSize)
         if not chunk:
             break
         _sha384.update(chunk)
-    fh.close()
+    file_stream.close()
     return _sha384.hexdigest()
 
 def sha512(path):
     _sha512 = hashlib.sha512()
-    fh = open(path, "rb")
+    file_stream = open(path, "rb")
     while True:
-        chunk = fh.read(_kChunkSize)
+        chunk = file_stream.read(_kChunkSize)
         if not chunk:
             break
         _sha512.update(chunk)
-    fh.close()
+    file_stream.close()
     return _sha512.hexdigest()

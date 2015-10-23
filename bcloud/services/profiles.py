@@ -11,34 +11,34 @@ from ..base import const
 from ..base import decorators
 from ..base.log import logger
 
-_kConfFile = os.path.join(const.kConfigDir, "conf.json")
+kConfFile = os.path.join(const.kConfigDir, "conf.json")
 
 @decorators.single_instance
-class Profiles:
+class Profiles(object):
 
     _profiles = []
     _default = ""
 
     def read(self):
         """Read profile info from disk."""
-        if not os.path.exists(_kConfFile):
-            os.makedirs(os.path.dirname(_kConfFile), exist_ok=True)
+        if not os.path.exists(kConfFile):
+            os.makedirs(os.path.dirname(kConfFile), exist_ok=True)
             return
-        with open(_kConfFile) as fh:
-            conf = json.load(fh)
+        with open(kConfFile) as file_stream:
+            conf = json.load(file_stream)
         self._default = conf["default"]
         self._profiles = conf["profiles"]
 
     def write(self):
         """Write profile info to disk."""
-        if not os.path.exists(_kConfFile):
-            os.makedirs(os.path.dirname(_kConfFile), exist_ok=True)
+        if not os.path.exists(kConfFile):
+            os.makedirs(os.path.dirname(kConfFile), exist_ok=True)
         conf = {
             "default": self._default,
             "profiles": self._profiles,
         }
-        with open(_kConfFile, "w") as fh:
-            json.dump(conf, fh)
+        with open(kConfFile, "w") as file_stream:
+            json.dump(conf, file_stream)
 
     def add(self, profile_name):
         """Add a new profile item."""

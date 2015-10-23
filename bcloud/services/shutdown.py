@@ -6,7 +6,7 @@ import os
 
 import dbus
 
-_kSessionBus, _kSystemBus = 0, 1
+kSessionBus, kSystemBus = 0, 1
 
 class Shutdown(object):
     """Shutdown the system after the current snapshot has finished.
@@ -19,7 +19,7 @@ class Shutdown(object):
     dbus_shutdown = {
         # Put unity dbus interface ahead of gnome
         "unity": {
-            "bus": _kSessionBus,
+            "bus": kSessionBus,
             "service": "com.canonical.Unity",
             "objectPath": "/com/canonical/Unity/Session",
             "method": "Shutdown",
@@ -27,7 +27,7 @@ class Shutdown(object):
             "arguments": (),
         },
         "gnome": {
-            "bus": _kSessionBus,
+            "bus": kSessionBus,
             "service": "org.gnome.SessionManager",
             "objectPath": "/org/gnome/SessionManager",
             "method": "Shutdown",
@@ -42,7 +42,7 @@ class Shutdown(object):
             #           2 force
         },
         "kde": {
-            "bus": _kSessionBus,
+            "bus": kSessionBus,
             "service": "org.kde.ksmserver",
             "objectPath": "/KSMServer",
             "method": "logout",
@@ -58,7 +58,7 @@ class Shutdown(object):
                 #           2 immediately
          },
          "xfce": {
-             "bus": _kSessionBus,
+             "bus": kSessionBus,
              "service": "org.xfce.SessionManager",
              "objectPath": "/org/xfce/SessionManager",
              "method": "Shutdown",
@@ -79,7 +79,7 @@ class Shutdown(object):
              #           False   don"t allow saving
         },
         "mate": {
-            "bus": _kSessionBus,
+            "bus": kSessionBus,
             "service": "org.mate.SessionManager",
             "objectPath": "/org/mate/SessionManager",
             "method": "Shutdown",
@@ -93,7 +93,7 @@ class Shutdown(object):
             #           2 force
         },
         "e17": {
-            "bus": _kSessionBus,
+            "bus": kSessionBus,
             "service": "org.enlightenment.Remote.service",
             "objectPath": "/org/enlightenment/Remote/RemoteObject",
             "method": "Halt",
@@ -106,7 +106,7 @@ class Shutdown(object):
             "arguments": (),
         },
         "z_freed": {
-            "bus": _kSystemBus,
+            "bus": kSystemBus,
             "service": "org.freedesktop.ConsoleKit",
             "objectPath": "/org/freedesktop/ConsoleKit/Manager",
             "method": "Stop",
@@ -115,7 +115,12 @@ class Shutdown(object):
         },
     }
 
+    _instance = None
+
     def __init__(self):
+        if self._instance:
+            raise TypeError("Call Shutdown.instance instead.")
+
         self._proxy, self._args = self._prepair()
 
         # Indicate if a valid dbus service is available to shutdown system.
@@ -132,7 +137,7 @@ class Shutdown(object):
             return (None, None)
         for dbus_props in self.dbus_shutdown.values():
             try:
-                if dbus_props["bus"] == _kSessionBus:
+                if dbus_props["bus"] == kSessionBus:
                     bus = sessionbus
                 else:
                     bus = systembus

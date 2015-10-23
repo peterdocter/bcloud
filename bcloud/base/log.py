@@ -10,12 +10,14 @@ import time
 
 from . import const
 
-_kLogInterval = 30 * 86400      # 30 days
-_kLogFileMaxSize = 5 * 2 ** 20  # 5Mb
-_kBackupCount = 5               # Number of backup files used by logging mod.
-_kLogLevel = logging.INFO
-_kFileLog = os.path.join(const.kConfigDir, "bcloud.log")
-_kConsoleLog = os.path.join(const.kConfigDir, "bcloud-console.log")
+__all__ = ("logger", "redirect_stdout")
+
+kLogInterval = 30 * 86400      # 30 days
+kLogFileMaxSize = 5 * 2 ** 20  # 5Mb
+kBackupCount = 5               # Number of backup files used by logging mod.
+kLogLevel = logging.INFO
+kFileLog = os.path.join(const.kConfigDir, "bcloud.log")
+kConsoleLog = os.path.join(const.kConfigDir, "bcloud-console.log")
 
 def _init_logger(log_file, log_level, maxBytes, backupCount):
     looger = logging.getLogger(const.kAppName)
@@ -29,13 +31,13 @@ def _init_logger(log_file, log_level, maxBytes, backupCount):
     return looger
 
 # Global logging instance.
-logger = _init_logger(_kFileLog, _kLogLevel, _kLogFileMaxSize, _kBackupCount)
+logger = _init_logger(kFileLog, kLogLevel, kLogFileMaxSize, kBackupCount)
 
 def redirect_stdout():
     """Redirect stdout and stderr to file."""
-    if (os.path.exists(_kConsoleLog) and
-            time.time() - os.stat(_kConsoleLog).st_ctime > _kLogInterval):
-        os.remove(_kConsoleLog)
-    fd = open(_kConsoleLog, "a")
-    sys.stdout = fd
-    sys.stderr = fd
+    if (os.path.exists(kConsoleLog) and
+            time.time() - os.stat(kConsoleLog).st_ctime > kLogInterval):
+        os.remove(kConsoleLog)
+    file_stream = open(kConsoleLog, "a")
+    sys.stdout = file_stream
+    sys.stderr = file_stream
