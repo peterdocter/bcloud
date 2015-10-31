@@ -11,4 +11,4 @@ def copy(text):
     """Copy text to system clipboard."""
     clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
     clipboard.set_text(text, -1)
-    notify(_("%s copied to clipboard") % text))
+    notify(_("%s copied to clipboard") % text)
