@@ -4,9 +4,6 @@
 
 from gi.repository import GObject
 
-from ..base import decorators
-
-@decorators.single_instance
 class SignalManager(GObject.GObject):
 
     __gsignals__ = {
@@ -30,3 +27,6 @@ class SignalManager(GObject.GObject):
             (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE,
                 [GObject.TYPE_PYOBJECT, str]),
     }
+
+# Global instance of signal manager.
+signal_manager = SignalManager()
