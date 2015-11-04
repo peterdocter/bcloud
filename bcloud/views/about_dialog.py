@@ -2,14 +2,17 @@
 # Use of this source code is governed by General Public License that
 # can be found in the LICENSE file.
 
+"""Defines AboutDialog class."""
+
 from gi.repository import Gtk
 
 from ..base import const
 from ..base.i18n import _
 
-_kHomepage = "https://github.com/LiuLang/bcloud"
-# https://github.com/LiuLang/bcloud/pulls
-_kAuthors = (
+kHomepage = "https://github.com/LiuLang/bcloud"
+
+# See https://github.com/LiuLang/bcloud/pulls
+kAuthors = (
     "Alexzhang <alex8224@gmail.com>",
     "Aetf <horizonvei@gmail.com>",
     "CzBiX <czbix@live.com>",
@@ -23,10 +26,11 @@ _kAuthors = (
     "slawdan <schludern@gmail.com>",
     "Zihao Wang <wzhdev@gmail.com>",
 )
-_kCopyright = "Copyright (c) 2014-2015 LiuLang"
-_kDescription = _("Baidu Pan client for GNU/Linux desktop users.")
+kCopyright = "Copyright (c) 2014-2015 LiuLang"
+kDescription = _("Baidu Pan client for GNU/Linux desktop users.")
 
 class AboutDialog(Gtk.AboutDialog):
+    """AboutDialog displays basic information about this program."""
 
     def __init__(self, parent):
         super().__init__()
@@ -35,8 +39,8 @@ class AboutDialog(Gtk.AboutDialog):
         self.set_program_name(const.kAppFullName)
         self.set_logo_icon_name(const.kAppName)
         self.set_version(const.kVersion)
-        self.set_comments(_kDescription)
-        self.set_copyright(_kCopyright)
-        self.set_website(_kHomepage)
+        self.set_comments(kDescription)
+        self.set_copyright(kCopyright)
+        self.set_website(kHomepage)
         self.set_license_type(Gtk.License.GPL_3_0)
-        self.set_authors(_kAuthors)
+        self.set_authors(kAuthors)

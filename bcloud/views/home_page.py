@@ -2,6 +2,8 @@
 # Use of this source code is governed by GPLv3 license that can be found
 # in http://www.gnu.org/licenses/gpl-3.0.html
 
+"""Defines HomePage class."""
+
 import traceback
 
 from gi.repository import Gdk
@@ -10,12 +12,15 @@ from gi.repository import Gtk
 from ..base import const
 from ..base.i18n import _
 from ..base.log import logger
+from ..controllers.signal_manager import SignalManager
 from ..services.settings import Settings
 from .icon_window import IconWindow, TreeWindow
 from . import util
 from .util import TargetInfo, TargetType, ViewMode
 
-# 用于处理拖放上传
+__all__ = ("HomePage", )
+
+# Defines targets to drop to upload files.
 kDropTargets = (
     (TargetType.kUriList, Gtk.TargetFlags.OTHER_APP, TargetInfo.kUriList),
 )
@@ -66,7 +71,6 @@ class PathBox(Gtk.Box):
 
         # listen mouse button events
         self.parent.connect("button-press-event", self.on_button_press)
-
         return back_button, forward_button
 
     def on_back_button_clicked(self, button):
@@ -202,8 +206,8 @@ class HomePage(Gtk.Box):
             # toggle view mode
             list_view_button = Gtk.RadioButton()
             list_view_button.set_mode(False)
-            list_view_img = Gtk.Image.new_from_icon_name("view-list-symbolic",
-                    Gtk.IconSize.SMALL_TOOLBAR)
+            list_view_img = Gtk.Image.new_from_icon_name(
+                "view-list-symbolic", Gtk.IconSize.SMALL_TOOLBAR)
             list_view_button.set_image(list_view_img)
             right_box.pack_start(list_view_button, False, False, 0)
 
@@ -211,9 +215,10 @@ class HomePage(Gtk.Box):
             grid_view_button.set_mode(False)
             grid_view_button.join_group(list_view_button)
             grid_view_button.set_active(
-                    Settings().get_property(self.name) == ViewMode.kIconView)
-            grid_view_img = Gtk.Image.new_from_icon_name("view-grid-symbolic",
-                    Gtk.IconSize.SMALL_TOOLBAR)
+                    Settings.instance().get_property(self.name) ==
+                    ViewMode.kIconView)
+            grid_view_img = Gtk.Image.new_from_icon_name(
+                "view-grid-symbolic", Gtk.IconSize.SMALL_TOOLBAR)
             grid_view_button.set_image(grid_view_img)
             list_view_button.connect("clicked",
                                      self.on_list_view_button_clicked)
@@ -223,8 +228,8 @@ class HomePage(Gtk.Box):
 
             # reload button
             reload_button = Gtk.Button()
-            reload_img = Gtk.Image.new_from_icon_name("view-refresh-symbolic",
-                    Gtk.IconSize.SMALL_TOOLBAR)
+            reload_img = Gtk.Image.new_from_icon_name(
+                "view-refresh-symbolic", Gtk.IconSize.SMALL_TOOLBAR)
             reload_button.set_image(reload_img)
             reload_button.set_tooltip_text(_("Reload (F5)"))
             reload_button.connect("clicked", self.reload)
@@ -232,11 +237,11 @@ class HomePage(Gtk.Box):
 
             # search button
             search_button = Gtk.ToggleButton()
-            search_img = Gtk.Image.new_from_icon_name("edit-find-symbolic",
-                    Gtk.IconSize.SMALL_TOOLBAR)
+            search_img = Gtk.Image.new_from_icon_name(
+                "edit-find-symbolic", Gtk.IconSize.SMALL_TOOLBAR)
             search_button.set_image(search_img)
             search_button.set_tooltip_text(
-                    _("Search documents and folders by name"))
+                _("Search documents and folders by name"))
             search_button.connect("toggled", self.on_search_button_toggled)
             self.headerbar.pack_end(search_button)
 
@@ -247,7 +252,7 @@ class HomePage(Gtk.Box):
 
             self.search_entry = Gtk.SearchEntry()
             self.search_entry.set_icon_from_icon_name(
-                    Gtk.EntryIconPosition.PRIMARY, "edit-find-symbolic")
+                Gtk.EntryIconPosition.PRIMARY, "edit-find-symbolic")
             self.search_entry.props.no_show_all = True
             self.search_entry.props.visible = False
             self.search_entry.connect("activate",
@@ -273,11 +278,11 @@ class HomePage(Gtk.Box):
 
             # search button
             search_button = Gtk.ToggleButton()
-            search_img = Gtk.Image.new_from_icon_name("edit-find-symbolic",
-                    Gtk.IconSize.SMALL_TOOLBAR)
+            search_img = Gtk.Image.new_from_icon_name(
+                "edit-find-symbolic", Gtk.IconSize.SMALL_TOOLBAR)
             search_button.set_image(search_img)
             search_button.set_tooltip_text(
-                    _("Search documents and folders by name"))
+                _("Search documents and folders by name"))
             search_button.connect("toggled", self.on_search_button_toggled)
             nav_bar.pack_start(search_button, False, False, 0)
 
@@ -291,8 +296,8 @@ class HomePage(Gtk.Box):
             # toggle view mode
             list_view_button = Gtk.RadioButton()
             list_view_button.set_mode(False)
-            list_view_img = Gtk.Image.new_from_icon_name("view-list-symbolic",
-                    Gtk.IconSize.SMALL_TOOLBAR)
+            list_view_img = Gtk.Image.new_from_icon_name(
+                "view-list-symbolic", Gtk.IconSize.SMALL_TOOLBAR)
             list_view_button.set_image(list_view_img)
             right_box.pack_start(list_view_button, False, False, 0)
 
@@ -300,9 +305,9 @@ class HomePage(Gtk.Box):
             grid_view_button.set_mode(False)
             grid_view_button.join_group(list_view_button)
             grid_view_button.set_active(
-                    self.app.profile["view-mode"][self.name] == const.ICON_VIEW)
-            grid_view_img = Gtk.Image.new_from_icon_name("view-grid-symbolic",
-                    Gtk.IconSize.SMALL_TOOLBAR)
+                self.app.profile["view-mode"][self.name] == const.ICON_VIEW)
+            grid_view_img = Gtk.Image.new_from_icon_name(
+                "view-grid-symbolic", Gtk.IconSize.SMALL_TOOLBAR)
             grid_view_button.set_image(grid_view_img)
             list_view_button.connect("clicked",
                                      self.on_list_view_button_clicked)
@@ -312,8 +317,8 @@ class HomePage(Gtk.Box):
 
             self.search_entry = Gtk.Entry()
             self.search_entry.set_icon_from_icon_name(
-                    Gtk.EntryIconPosition.PRIMARY,
-                    "folder-saved-search-symbolic")
+                Gtk.EntryIconPosition.PRIMARY,
+                "folder-saved-search-symbolic")
             self.search_entry.props.no_show_all = True
             self.search_entry.props.visible = False
             self.search_entry.connect("activate",
@@ -328,7 +333,7 @@ class HomePage(Gtk.Box):
     def check_first(self):
         if self.first_run:
             self.first_run = False
-            if Settings().home_page_mode == ViewMode.kIconView:
+            if Settings.instance().home_page_mode == ViewMode.kIconView:
                 self.icon_window = IconWindow(self)
             else:
                 self.icon_window = TreeWindow(self)
@@ -393,13 +398,14 @@ class HomePage(Gtk.Box):
 
     def do_drag_data_received(self, drag_context, x, y, data, info, time):
         """Upload files/folders to |self.path|."""
-        if not Settings().signed_in:
+        if not Settings.instance().signed_in:
             return
         if info == TargetInfo.kUriList:
             uris = data.get_uris()
             source_paths = util.uris_to_paths(uris)
             if source_paths:
-                SignalManager().emit("upload-files", source_paths, self.path)
+                SignalManager.instance().emit("upload-files", source_paths,
+                                              self.path)
 
     def on_search_button_toggled(self, search_button):
         status = search_button.get_active()
@@ -415,7 +421,7 @@ class HomePage(Gtk.Box):
             self.icon_window = TreeWindow(self, self.app)
             self.pack_end(self.icon_window, True, True, 0)
             self.icon_window.show_all()
-            Settings().home_page_mode = ViewMode.kListView
+            Settings.instance().home_page_mode = ViewMode.kListView
             self.reload()
 
     def on_grid_view_button_clicked(self, grid_view_button):
@@ -424,7 +430,7 @@ class HomePage(Gtk.Box):
             self.icon_window = IconWindow(self, self.app)
             self.pack_end(self.icon_window, True, True, 0)
             self.icon_window.show_all()
-            Settings().home_page_mode = ViewMode.kIconView
+            Settings.instance().home_page_mode = ViewMode.kIconView
             self.reload()
 
     def on_search_entry_activated(self, search_entry):

@@ -2,6 +2,8 @@
 # Use of this source code is governed by GPLv3 license that can be found
 # in http://www.gnu.org/licenses/gpl-3.0.html
 
+"""Defines SigninDialog class."""
+
 import json
 import os
 import time
@@ -21,6 +23,7 @@ from . import widgets
 
 DELTA = 1 * 24 * 60 * 60   # 1 days
 
+__all__ = ("SigninDialog", )
 
 class SigninVcodeDialog(Gtk.Dialog):
     """登陆时的验证码对话框"""
@@ -79,7 +82,7 @@ class SigninVcodeDialog(Gtk.Dialog):
     def update_img(self, req_data, error=None):
         if error or not req_data:
             self.refresh_vcode()
-            logger.error("SigninDialog.update_img: %s, %s" % (req_data, error))
+            logger.error("SigninDialog.update_img: %s, %s", req_data, error)
             return
         vcode_path = os.path.join(Config.get_tmp_path(self.username),
                                   "bcloud-signin-vcode.jpg")
@@ -93,8 +96,7 @@ class SigninVcodeDialog(Gtk.Dialog):
     def refresh_vcode(self):
         def _refresh_vcode(info, error=None):
             if not info or error:
-                logger.error("SigninVcode.refresh_vcode: %s, %s." %
-                             (info, error))
+                logger.error("SigninVcode.refresh_vcode: %s, %s.", info, error)
                 return
             logger.debug("refresh vcode: %s" % info)
             self.codeString = info["data"]["verifyStr"]

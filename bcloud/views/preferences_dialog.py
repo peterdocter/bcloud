@@ -2,7 +2,8 @@
 # Use of this source code is governed by General Public License that
 # can be found in the LICENSE file.
 
-from gi.repository import GLib
+"""Defines PreferencesDialog class."""
+
 from gi.repository import GObject
 from gi.repository import Gtk
 
@@ -10,19 +11,22 @@ from ..base.i18n import _
 from ..services.settings import Settings
 
 class PreferencesDialog(Gtk.Dialog):
+    """PreferencesDialog is a dialog to let use setup program configurations."""
 
     def __init__(self, parent_window):
         super().__init__(_("Preferences"), parent_window,
                          Gtk.DialogFlags.MODAL,
                          (Gtk.STOCK_CLOSE, Gtk.ResponseType.OK))
         self.set_default_response(Gtk.ResponseType.OK)
-        self.set_default_size(480, 360)
-        self.set_border_width(10)
 
         self._init_ui()
 
     def _init_ui(self):
-        settings = Settings()
+        """Initialize ui widgets."""
+        self.set_default_size(480, 360)
+        self.set_border_width(10)
+
+        settings = Settings.instance()
         box = self.get_content_area()
 
         notebook = Gtk.Notebook()
@@ -45,7 +49,7 @@ class PreferencesDialog(Gtk.Dialog):
                                     GObject.BindingFlags.BIDIRECTIONAL)
         stream_switch.props.halign = Gtk.Align.START
         stream_switch.set_tooltip_text(
-                _("Open the compressed version of videos, useful for those whose network connection is slow."))
+            _("Open the compressed version of videos, useful for those whose network connection is slow."))
         general_grid.attach(stream_switch, 1, 0, 1, 1)
 
         notify_label = Gtk.Label.new(_("Use notification:"))
@@ -110,9 +114,9 @@ class PreferencesDialog(Gtk.Dialog):
         concurr_label.props.xalign = 1
         download_grid.attach(concurr_label, 0, 1, 1, 1)
         concurr_spin = Gtk.SpinButton.new_with_range(
-                Settings.props.concurrent_download.minimum,
-                Settings.props.concurrent_download.maximum,
-                1)
+            Settings.props.concurrent_download.minimum,
+            Settings.props.concurrent_download.maximum,
+            1)
         concurr_spin.props.value = settings.props.concurrent_download
         concurr_spin.bind_property("value", settings, "concurrent-download",
                                    GObject.BindingFlags.BIDIRECTIONAL)
@@ -123,9 +127,9 @@ class PreferencesDialog(Gtk.Dialog):
         segments_label.props.xalign = 1
         download_grid.attach(segments_label, 0, 2, 1, 1)
         segments_spin = Gtk.SpinButton.new_with_range(
-                Settings.props.concurrent_per_task.minimum,
-                Settings.props.concurrent_per_task.maximum,
-                1)
+            Settings.props.concurrent_per_task.minimum,
+            Settings.props.concurrent_per_task.maximum,
+            1)
         segments_spin.props.value = settings.props.concurrent_per_task
         segments_spin.bind_property("value", settings, "concurrent-per-task",
                                     GObject.BindingFlags.BIDIRECTIONAL)
@@ -139,9 +143,9 @@ class PreferencesDialog(Gtk.Dialog):
         retries_each.props.xalign = 1
         download_grid.attach(retries_each, 0, 3, 1, 1)
         retries_spin = Gtk.SpinButton.new_with_range(
-                Settings.props.download_retries.minimum,
-                Settings.props.download_retries.maximum,
-                1)
+            Settings.props.download_retries.minimum,
+            Settings.props.download_retries.maximum,
+            1)
         retries_spin.props.value = settings.props.download_retries
         retries_spin.bind_property("value", settings, "download-retries",
                                    GObject.BindingFlags.BIDIRECTIONAL)
@@ -156,12 +160,13 @@ class PreferencesDialog(Gtk.Dialog):
         download_timeout.props.xalign = 1
         download_grid.attach(download_timeout, 0, 4, 1, 1)
         download_timeout_spin = Gtk.SpinButton.new_with_range(
-                Settings.props.download_timeout.minimum,
-                Settings.props.download_timeout.maximum,
-                10)
+            Settings.props.download_timeout.minimum,
+            Settings.props.download_timeout.maximum,
+            10)
         download_timeout_spin.props.value = settings.props.download_timeout
-        download_timeout_spin.bind_property("value", settings,
-                "download-timeout", GObject.BindingFlags.BIDIRECTIONAL)
+        download_timeout_spin.bind_property(
+            "value", settings, "download-timeout",
+            GObject.BindingFlags.BIDIRECTIONAL)
         download_timeout_spin.props.halign = Gtk.Align.START
         download_grid.attach(download_timeout_spin, 1, 4, 1, 1)
         download_timeout_second = Gtk.Label.new(_("seconds"))
@@ -179,17 +184,18 @@ class PreferencesDialog(Gtk.Dialog):
         download_mode_combo.bind_property("active", settings, "download-mode",
                                           GObject.BindingFlags.BIDIRECTIONAL)
         download_mode_combo.set_tooltip_text(
-                _("What to do when downloading a file which already exists on local disk"))
+            _("What to do when downloading a file which already exists on local disk"))
         download_grid.attach(download_mode_combo, 1, 5, 2, 1)
 
         confirm_delete_label = Gtk.Label(
-                _("Ask me when deleting unfinished tasks:"))
+            _("Ask me when deleting unfinished tasks:"))
         download_grid.attach(confirm_delete_label, 0, 6, 1, 1)
         confirm_delete_switch = Gtk.Switch()
         confirm_delete_switch.props.active = \
-                settings.props.download_confirm_delete
-        confirm_delete_switch.bind_property("active", settings,
-                "download-confirm-delete", GObject.BindingFlags.BIDIRECTIONAL)
+            settings.props.download_confirm_delete
+        confirm_delete_switch.bind_property(
+            "active", settings, "download-confirm-delete",
+            GObject.BindingFlags.BIDIRECTIONAL)
         confirm_delete_switch.props.halign = Gtk.Align.START
         download_grid.attach(confirm_delete_switch, 1, 6, 1, 1)
 
@@ -206,13 +212,14 @@ class PreferencesDialog(Gtk.Dialog):
         concurr_upload_label.props.xalign = 1
         upload_grid.attach(concurr_upload_label, 0, 0, 1, 1)
         concurr_upload_spin = Gtk.SpinButton.new_with_range(
-                Settings.props.concurrent_upload.minimum,
-                Settings.props.concurrent_upload.maximum,
-                1)
+            Settings.props.concurrent_upload.minimum,
+            Settings.props.concurrent_upload.maximum,
+            1)
         concurr_upload_spin.props.halign = Gtk.Align.START
         concurr_upload_spin.props.value = settings.props.concurrent_upload
-        concurr_upload_spin.bind_property("value", settings,
-                "concurrent-upload", GObject.BindingFlags.BIDIRECTIONAL)
+        concurr_upload_spin.bind_property(
+            "value", settings, "concurrent-upload",
+            GObject.BindingFlags.BIDIRECTIONAL)
         upload_grid.attach(concurr_upload_spin, 1, 0, 1, 1)
 
         upload_hidden_label = Gtk.Label.new(_("Upload hidden files:"))
@@ -221,7 +228,7 @@ class PreferencesDialog(Gtk.Dialog):
         upload_hidden_switch = Gtk.Switch()
         upload_hidden_switch.props.halign = Gtk.Align.START
         upload_hidden_switch.set_tooltip_text(
-                _("Also upload hidden files and folders"))
+            _("Also upload hidden files and folders"))
         upload_hidden_switch.props.active = settings.props.upload_hidden
         upload_hidden_switch.bind_property("active", settings, "upload-hidden",
                                            GObject.BindingFlags.BIDIRECTIONAL)
@@ -235,7 +242,7 @@ class PreferencesDialog(Gtk.Dialog):
         upload_mode_combo.append_text(_("Overwrite"))
         upload_mode_combo.append_text(_("Rename Automatically"))
         upload_mode_combo.set_tooltip_text(
-                _("What to do when uploading a file which already exists on server"))
+            _("What to do when uploading a file which already exists on server"))
         upload_mode_combo.props.active = settings.props.upload_mode
         upload_mode_combo.bind_property("active", settings, "upload-mode",
                                         GObject.BindingFlags.BIDIRECTIONAL)
@@ -271,7 +278,7 @@ class PreferencesDialog(Gtk.Dialog):
         sync_remote_dir_label.props.xalign = 1
         upload_grid.attach(sync_remote_dir_label, 0, 5, 1, 1)
         sync_remote_dir_button = Gtk.Button.new_with_label(
-                settings.props.sync_remote_dir)
+            settings.props.sync_remote_dir)
         sync_remote_dir_button.props.sensitive = settings.props.auto_sync
         settings.bind_property("auto-sync", sync_remote_dir_button, "sensitive")
         sync_remote_dir_button.connect("clicked",
@@ -281,16 +288,19 @@ class PreferencesDialog(Gtk.Dialog):
         box.show_all()
 
     def on_save_dir_updated(self, file_button):
+        """Save folder of file chooser button to settings."""
         dir_name = file_button.get_filename()
         if dir_name:
-            Settings().props.save_dir = dir_name
+            Settings.instance().props.save_dir = dir_name
 
     def on_sync_local_dir_updated(self, file_button):
+        """Save folder of file chooser button to settings."""
         dir_name = file_button.get_filename()
         if dir_name:
-            Settings().props.sync_local_dir = dir_name
+            Settings.instance().props.sync_local_dir = dir_name
 
     def on_sync_remote_dir_button_clicked(self, button):
+        """Save folder of remote folder chooser dialog to settings."""
         folder_dialog = FolderBrowserDialog()
         response = folder_dialog.run()
         if response != Gtk.ResponseType.OK:
@@ -299,4 +309,4 @@ class PreferencesDialog(Gtk.Dialog):
         dir_name = folder_dialog.get_path()
         folder_dialog.destroy()
         button.set_label(dir_name)
-        Settings().props.sync_remote_dir = dir_name
+        Settings.instance().props.sync_remote_dir = dir_name

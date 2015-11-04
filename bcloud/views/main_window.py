@@ -7,8 +7,8 @@ from gi.repository import Gtk
 
 from ..base import const
 from ..base.i18n import _
-from ..controllers.signal_manager import signal_manager
-from ..services.settings import settings
+from ..controllers.signal_manager import SignalManager
+from ..services.settings import Settings
 from .category_page import *
 from .home_page import HomePage
 from . import util
@@ -32,6 +32,8 @@ class MainWindow(Gtk.ApplicationWindow):
         self._init_connect()
 
     def _init_ui(self):
+        settings = Settings.instance()
+
         self.set_default_size(settings.window_width, settings.window_height)
         self.set_default_icon_name(const.kAppName)
         self.props.window_position = Gtk.WindowPosition.CENTER
@@ -100,6 +102,7 @@ class MainWindow(Gtk.ApplicationWindow):
         nav_selection.connect("changed", self.on_nav_selection_changed)
         self.notebook.connect('switch-page', self.on_notebook_switched)
 
+        signal_manager = SignalManager.instance()
         signal_manager.connect("reload-current-page", self.reload_current_page)
         signal_manager.connect("show-main-window", lambda obj: self.present())
         signal_manager.connect("toggle-main-window-visibility",
@@ -152,25 +155,26 @@ class MainWindow(Gtk.ApplicationWindow):
             self.present()
 
     def do_check_resize(self):
+        settings = Settings.instance()
         settings.window_width, settings.window_height = self.get_size()
         return Gtk.Window.do_check_resize(self)
 
     def do_delete_event(self, event):
-        if settings.use_status_icon:
+        if Settings.instance().use_status_icon:
             self.hide()
         else:
-            signal_manager.emit("app-quit")
+            SignalManager.instance().emit("app-quit")
 #
     def do_drag_data_received(self, drag_context, x, y, data, info, time):
         """Drag a file/folder to main window, opens a file chooser dialog."""
-        if not settings.signed_in:
+        if not Settings.instance().signed_in:
             return
 
         if info == TargetInfo.kUriList:
             uris = data.get_uris()
             source_paths = util.uris_to_paths(uris)
             if source_paths:
-                signal_manager.emit("upload-files", source_paths, "/")
+                SignalManager.instance().emit("upload-files", source_paths, "/")
 
     def on_nav_selection_changed(self, nav_selection):
         model, tree_iter = nav_selection.get_selected()
@@ -184,7 +188,7 @@ class MainWindow(Gtk.ApplicationWindow):
         page.check_first()
         page.on_page_show()
 
-    def reload_current_page(self, *args):
+    def reload_current_page(self, *_):
         """Reload current page.
 
         Note: All pages shall implement reload() method.
@@ -195,9 +199,9 @@ class MainWindow(Gtk.ApplicationWindow):
     def switch_page_by_index(self, index):
         self.notebook.set_current_page(index)
 
-    def switch_page(self, page):
-        for index, p in enumerate(self.notebook):
-            if p == page:
+    def switch_page(self, new_page):
+        for index, page in enumerate(self.notebook):
+            if new_page == page:
                 self.nav_selection.select_iter(self.nav_liststore[index].iter)
                 break
 
@@ -208,6 +212,6 @@ class MainWindow(Gtk.ApplicationWindow):
             self.default_color = kDarkColor
         else:
             self.default_color = kLightColor
-        if settings.signed_in:
+        if Settings.instance().signed_in:
             for row in self.nav_liststore:
                 row[kColorCol] = self.default_color

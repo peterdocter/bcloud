@@ -654,8 +654,8 @@ class TreeWindow(IconWindow):
 
     kIconSize = 24
 
-    def __init__(self, parent, app):
-        super().__init__(parent, app)
+    def __init__(self, parent):
+        super().__init__(parent)
 
     # Override
     def init_ui(self):

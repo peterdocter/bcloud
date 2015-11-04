@@ -10,11 +10,21 @@ NOTE: |password| is not kept in settings, it is kept in keyring if available and
       is only used when retrieving cookie and tokens from remote server.
 """
 
+import json
+import os
+
 from gi.repository import GObject
 
-_kAuthConf = "auth.json"
+from ..base import const
+from ..base import string_hash
+
+kAuthConf = "auth.json"
 
 class Settings(GObject.GObject):
+    """Settings provides interface to read/write program settings.
+
+    Other parts of program should only get or set its properties.
+    """
 
     use_streaming = GObject.property(type=bool, default=True)
     use_notify = GObject.property(type=bool, default=True)
@@ -22,7 +32,7 @@ class Settings(GObject.GObject):
     use_status_icon = GObject.property(type=bool, default=False)
     display_avatar = GObject.property(type=bool, default=True)
 
-    save_dir = GObject.property(type=str, default="") 
+    save_dir = GObject.property(type=str, default="")
     concurrent_download = GObject.property(type=int, minimum=1, maximum=5,
                                            default=3)
     concurrent_per_task = GObject.property(type=int, minimum=1, maximum=5,
@@ -61,6 +71,19 @@ class Settings(GObject.GObject):
     MusicPage = GObject.property(type=int, minimum=0, maximum=1, default=0)
     OtherPage = GObject.property(type=int, minimum=0, maximum=1, default=0)
 
+    _instance = None
+
+    def __init__(self):
+        if self._instance:
+            raise ValueError("Call Settings.instance() instead.")
+        super().__init__()
+
+    @classmethod
+    def instance(cls):
+        if not cls._instance:
+            cls._instance = cls()
+        return cls._instance
+
     def reset(self):
         """Reset settings to default value and clear username/password."""
         for prop in self.props:
@@ -68,24 +91,23 @@ class Settings(GObject.GObject):
 
     def read(self):
         """Read settings from disk."""
-        path = os.path.join(self.tmp_path(), _kAuthConf)
+        path = os.path.join(self.tmp_path(), kAuthConf)
         if not os.path.exists(path):
             self.reset()
             return
-        with open(path) as fh:
-            conf = json.load(fh)
+        with open(path) as file_stream:
+            conf = json.load(file_stream)
         for key in conf:
             self.set_property(key, conf[key])
 
     def write(self):
         """Write settings to disk."""
-        print("[Settings.write]")
-        path = os.path.join(self.tmp_path(), _kAuthConf)
+        path = os.path.join(self.tmp_path(), kAuthConf)
         conf = {}
         for prop in self.props:
             conf[prop.name] = self.get_property(prop.name)
-        with open(path, "w") as fh:
-            json.dump(conf, fh)
+        with open(path, "w") as file_stream:
+            json.dump(conf, file_stream)
 
     @property
     def username_hash(self):
@@ -116,5 +138,3 @@ class Settings(GObject.GObject):
         if not os.path.exists(path):
             os.makedirs(path, exist_ok=True)
         return path
-
-settings = Settings()

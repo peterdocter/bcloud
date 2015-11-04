@@ -69,7 +69,6 @@ def urloption(url, headers={}, retries=kRetries):
             logger.error(traceback.format_exc())
     return None
 
-
 class ForbiddenHandler(urllib.request.HTTPErrorProcessor):
 
     def http_error_403(self, req, fp, code, msg, headers):
@@ -77,7 +76,6 @@ class ForbiddenHandler(urllib.request.HTTPErrorProcessor):
 
     http_error_400 = http_error_403
     http_error_500 = http_error_403
-
 
 def urlopen_simple(url, retries=kRetries, timeout=kTimeout):
     for i in range(retries):

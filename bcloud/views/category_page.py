@@ -1,7 +1,8 @@
-
 # Copyright (C) 2014-2015 LiuLang <gsushzhsosgsu@gmail.com>
 # Use of this source code is governed by GPLv3 license that can be found
 # in http://www.gnu.org/licenses/gpl-3.0.html
+
+"""Defines CategoryPage base class and other inherited classes."""
 
 from gi.repository import Gtk
 
@@ -18,11 +19,17 @@ __all__ = (
 )
 
 class CategoryPage(Gtk.Box):
+    """CategoryPage defines basic operations about category operations.
+
+    Classes inherited from this class shall defines its own |name| and
+    |page_num|.
+    """
 
     page_num = 1
     has_next = True
     first_run = True
     name = "CategoryPage"
+    disname = "CategoryPage"
 
     def __init__(self, parent):
         super().__init__(orientation=Gtk.Orientation.VERTICAL)
@@ -44,8 +51,8 @@ class CategoryPage(Gtk.Box):
             # toggle view mode
             list_view_button = Gtk.RadioButton()
             list_view_button.set_mode(False)
-            list_view_img = Gtk.Image.new_from_icon_name("view-list-symbolic",
-                    Gtk.IconSize.SMALL_TOOLBAR)
+            list_view_img = Gtk.Image.new_from_icon_name(
+                "view-list-symbolic", Gtk.IconSize.SMALL_TOOLBAR)
             list_view_button.set_image(list_view_img)
             right_box.pack_start(list_view_button, False, False, 0)
 
@@ -53,20 +60,21 @@ class CategoryPage(Gtk.Box):
             grid_view_button.set_mode(False)
             grid_view_button.join_group(list_view_button)
             grid_view_button.set_active(
-                    Settings().get_property(self.name) == ViewMode.kIconView)
-            grid_view_img = Gtk.Image.new_from_icon_name("view-grid-symbolic",
-                    Gtk.IconSize.SMALL_TOOLBAR)
+                Settings.instance().get_property(self.name) ==
+                ViewMode.kIconView)
+            grid_view_img = Gtk.Image.new_from_icon_name(
+                "view-grid-symbolic", Gtk.IconSize.SMALL_TOOLBAR)
             grid_view_button.set_image(grid_view_img)
-            list_view_button.connect("clicked",
-                    self.on_list_view_button_clicked)
-            grid_view_button.connect("clicked",
-                    self.on_grid_view_button_clicked)
+            list_view_button.connect(
+                "clicked", self.on_list_view_button_clicked)
+            grid_view_button.connect(
+                "clicked", self.on_grid_view_button_clicked)
             right_box.pack_start(grid_view_button, False, False, 0)
 
             # reload button
             reload_button = Gtk.Button()
-            reload_img = Gtk.Image.new_from_icon_name("view-refresh-symbolic",
-                    Gtk.IconSize.SMALL_TOOLBAR)
+            reload_img = Gtk.Image.new_from_icon_name(
+                "view-refresh-symbolic", Gtk.IconSize.SMALL_TOOLBAR)
             reload_button.set_image(reload_img)
             reload_button.set_tooltip_text(_("Reload (F5)"))
             reload_button.connect("clicked", self.reload)
@@ -93,8 +101,8 @@ class CategoryPage(Gtk.Box):
             # toggle view mode
             list_view_button = Gtk.RadioButton()
             list_view_button.set_mode(False)
-            list_view_img = Gtk.Image.new_from_icon_name("view-list-symbolic",
-                    Gtk.IconSize.SMALL_TOOLBAR)
+            list_view_img = Gtk.Image.new_from_icon_name(
+                "view-list-symbolic", Gtk.IconSize.SMALL_TOOLBAR)
             list_view_button.set_image(list_view_img)
             nav_bar.pack_start(list_view_button, False, False, 0)
 
@@ -103,14 +111,15 @@ class CategoryPage(Gtk.Box):
             grid_view_button.set_mode(False)
             grid_view_button.join_group(list_view_button)
             grid_view_button.set_active(
-                    Settings().get_property(self.name) == ViewMode.kIconView)
-            grid_view_img = Gtk.Image.new_from_icon_name("view-grid-symbolic",
-                    Gtk.IconSize.SMALL_TOOLBAR)
+                Settings.instance().get_property(self.name) ==
+                ViewMode.kIconView)
+            grid_view_img = Gtk.Image.new_from_icon_name(
+                "view-grid-symbolic", Gtk.IconSize.SMALL_TOOLBAR)
             grid_view_button.set_image(grid_view_img)
-            list_view_button.connect("clicked",
-                    self.on_list_view_button_clicked)
-            grid_view_button.connect("clicked",
-                    self.on_grid_view_button_clicked)
+            list_view_button.connect(
+                "clicked", self.on_list_view_button_clicked)
+            grid_view_button.connect(
+                "clicked", self.on_grid_view_button_clicked)
             nav_bar.pack_start(grid_view_button, False, False, 0)
 
     def on_page_show(self):
@@ -121,7 +130,8 @@ class CategoryPage(Gtk.Box):
     def check_first(self):
         if self.first_run:
             self.first_run = False
-            if Settings().get_property(self.name) == ViewMode.kIconView:
+            if (Settings.instance().get_property(self.name) ==
+                    ViewMode.kIconView):
                 self.icon_window = IconWindow(self)
             else:
                 self.icon_window = TreeWindow(self)
@@ -174,7 +184,7 @@ class CategoryPage(Gtk.Box):
         #gutil.async_call(pcs.get_category, self.app.cookie, self.app.tokens,
         #                 self.category, self.page_num, callback=on_load_next)
 
-    def reload(self, *args):
+    def reload(self, *_):
         self.load()
 
     def on_list_view_button_clicked(self, button):
@@ -183,16 +193,16 @@ class CategoryPage(Gtk.Box):
             self.icon_window = TreeWindow(self)
             self.pack_end(self.icon_window, True, True, 0)
             self.icon_window.show_all()
-            Settings().set_property(self.name, ViewMode.kListView)
+            Settings.instance().set_property(self.name, ViewMode.kListView)
             self.reload()
 
     def on_grid_view_button_clicked(self, button):
         if isinstance(self.icon_window, TreeWindow):
             self.remove(self.icon_window)
-            self.icon_window = IconWindow(self, self.app)
+            self.icon_window = IconWindow(self)
             self.pack_end(self.icon_window, True, True, 0)
             self.icon_window.show_all()
-            Settings().set_property(self.name, ViewMode.kIconView)
+            Settings.instance().set_property(self.name, ViewMode.kIconView)
             self.reload()
 
 
