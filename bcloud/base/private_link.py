@@ -2,12 +2,14 @@
 # Use of this source code is governed by GPLv3 license that can be found
 # in http://www.gnu.org/licenses/gpl-3.0.html
 
+"""Decode private links."""
+
 import base64
 import traceback
 
 from .log import logger
 
-"""Decode private links."""
+__all__ = ("decode", )
 
 def _decodeFlashget(link):
     try:
@@ -50,7 +52,7 @@ def decode(link):
     if link_prefix in _router:
         try:
             return _router[link_prefix](link)
-        except Exception:
+        except IndexError:
             logger.error(traceback.format_exc())
             return ""
     else:
