@@ -17,7 +17,7 @@ except Exception:
     logger.warn(traceback.format_exc())
     is_available = False
 
-_kRetries = 5
+kRetries = 5
 
 def read_password(username):
     """Read password from keyring."""
@@ -33,7 +33,7 @@ def read_password(username):
 def write_password(username, password):
     """Write password to keyring."""
     if is_available:
-        for i in range(_kRetries):
+        for i in range(kRetries):
             try:
                 keyring.set_password(const.kDbusName, username, password)
                 break

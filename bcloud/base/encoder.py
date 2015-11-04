@@ -47,5 +47,5 @@ def decode_uri_component(text):
 def json_beautify(text):
     try:
         return json.dumps(json.loads(text), indent=4)
-    except Exception as e:
+    except ValueError:
         return ""

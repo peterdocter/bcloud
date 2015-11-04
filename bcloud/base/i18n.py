@@ -7,8 +7,10 @@ import os
 
 from . import const
 
-_kLocaleDir = os.path.join(const.kPrefix, "locale")
+__all__ = ("_", )
 
-gettext.bindtextdomain(const.kAppName, _kLocaleDir)
+kLocaleDir = os.path.join(const.kPrefix, "locale")
+
+gettext.bindtextdomain(const.kAppName, kLocaleDir)
 gettext.textdomain(const.kAppName)
 _ = gettext.gettext
