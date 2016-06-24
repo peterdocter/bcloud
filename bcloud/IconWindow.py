@@ -576,13 +576,24 @@ class IconWindow(Gtk.ScrolledWindow):
         def on_share(info, error=None):
             print('on share:', info, error)
             if error or not info or info[0]['errno'] != 0:
-                logger.error('IconWindow.on_share_activated: %s, %s' %
+                logger.error('IconWindow.on_private_share_activated: %s, %s' %
                              (info, error))
                 self.app.toast(_('Failed to share selected files'))
                 return
-            #self.app.update_clipboard(info['shorturl'])
+
             file_info, passwd = info
-            print('info:', file_info, passwd)
+            print('info :', info)
+            print('file_info:', file_info['shorturl'])
+            print('passwd:', passwd)
+
+            tipInfo = "".join([
+                "链接: ",
+                file_info['shorturl'],
+                " 密码: ",
+                passwd
+            ])
+            self.app.update_clipboard(tipInfo)
+
 
         tree_paths = self.iconview.get_selected_items()
         if not tree_paths:

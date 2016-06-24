@@ -235,7 +235,7 @@ def disable_share(cookie, tokens, shareid_list):
     else:
         return None
 
-def enable_private_share(cookie, tokens, fid_list):
+def enable_private_share(cookie, tokens, fid_list, passwd='smfx'):
     '''建立新的私密分享.
 
     密码是在本地生成的, 然后上传到服务器.
@@ -249,9 +249,8 @@ def enable_private_share(cookie, tokens, fid_list):
         '&appid=250528',
     ])
     print('url:', url)
-    passwd = 'dmlg'
     data = encoder.encode_uri(''.join([
-        'fid_list=[', str(fid_list), ']',
+        'fid_list=', str(fid_list),
         '&schannel=4&channel_list=[]',
         '&pwd=', passwd,
         ]))
@@ -518,7 +517,7 @@ def list_dir_all(cookie, tokens, path):
     page = 1
     while True:
         content = list_dir(cookie, tokens, path, page)
-        if not content:
+        if not content or int(content['errno']) != 0:
             return (path, None)
         if not content['list']:
             return (path, pcs_files)
