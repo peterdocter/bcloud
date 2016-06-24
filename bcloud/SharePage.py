@@ -76,6 +76,7 @@ class SharePage(Gtk.Box):
             self.headerbar = Gtk.HeaderBar()
             self.headerbar.props.show_close_button = True
             self.headerbar.props.has_subtitle = False
+            self.headerbar.set_title(self.disname)
 
             headerbar_box = Gtk.Box()
             self.headerbar.set_custom_title(headerbar_box)
@@ -209,6 +210,7 @@ class SharePage(Gtk.Box):
                 self.load_url()
 
         def on_get_share_uk(info, error=None):
+            print("[I]on_get_share_uk : ", info)
             if error or not info or not info[1]:
                 logger.error('SharePage.reload: %s, %s' % (error, info))
                 self.app.toast(_('Invalid link: {0}!'.format(self.curr_url)))
@@ -230,6 +232,7 @@ class SharePage(Gtk.Box):
                                      self.shareid, pwd,
                                      callback=on_verify_password)
                 else:
+                    print("[I] load_url .....", info)
                     self.load_url()
 
         self.liststore.clear()
@@ -249,6 +252,7 @@ class SharePage(Gtk.Box):
     def load_url(self):
         '''读取分享文件列表'''
         def on_load_url(filelist, error=None):
+            print("[I]on_load_url filelist", filelist)
             self.url_entry.props.secondary_icon_name = REFRESH_ICON
             if timestamp != self.url_entry.timestamp:
                 logger.debug('SharePage.load_url, dirname not match, ignored')
@@ -283,8 +287,11 @@ class SharePage(Gtk.Box):
                     '',
                 ])
 
+            print("--------------------------------------------filelist")
             for file_ in filelist:
-                isdir = file_['isdir'] == '1'
+                isdir = file_['isdir'] == '1' or file_['isdir'] == 1
+                print("isdir: ", isdir)
+                print("file_['isdir']: ", file_['isdir'])
                 pixbuf, type_ = self.app.mime.get(file_['path'], isdir,
                                                   icon_size=ICON_SIZE)
                 large_pixbuf, type_ = self.app.mime.get(file_['path'], isdir,
