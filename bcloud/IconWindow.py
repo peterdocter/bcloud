@@ -31,8 +31,8 @@ from bcloud import pcs
 from bcloud import util
 
 (PIXBUF_COL, NAME_COL, PATH_COL, TOOLTIP_COL, SIZE_COL, HUMAN_SIZE_COL,
-    ISDIR_COL, MTIME_COL, HUMAN_MTIME_COL, TYPE_COL, PCS_FILE_COL) = list(
-            range(11))
+    ISDIR_COL, MTIME_COL, HUMAN_MTIME_COL, TYPE_COL, PCS_FILE_COL, FID_COL, MD5_COL) = list(
+            range(13))
 TYPE_TORRENT = 'application/x-bittorrent'
 
 DRAG_TARGETS = (
@@ -63,11 +63,13 @@ class IconWindow(Gtk.ScrolledWindow):
         self.app = app
 
         # pixbuf, name, path, tooltip, size, humansize,
-        # isdir, mtime, human mtime, type, pcs_file
+        # isdir, mtime, human mtime, type, pcs_file,
+        # fs_id, md5
         self.liststore = Gtk.ListStore(GdkPixbuf.Pixbuf, str, str, str,
                                        GObject.TYPE_INT64, str,
                                        GObject.TYPE_INT, GObject.TYPE_INT64,
-                                       str, str, str)
+                                       str, str, str,
+                                       GObject.TYPE_INT64, str)
         self.init_ui()
 
     def init_ui(self):
@@ -119,10 +121,12 @@ class IconWindow(Gtk.ScrolledWindow):
                 human_size = util.get_human_size(pcs_file['size'])[0]
             mtime = pcs_file.get('server_mtime', 0)
             human_mtime = time.ctime(mtime)
+            fid = pcs_file.get('fs_id', 0)
+            md5 = pcs_file.get('md5', "")
             tree_iter = self.liststore.append([
                 pixbuf, name, path, tooltip, size, human_size,
                 pcs_file['isdir'], mtime, human_mtime, type_,
-                json.dumps(pcs_file)
+                json.dumps(pcs_file), fid, md5
             ])
             tree_iters.append(tree_iter)
         cache_path = Config.get_cache_path(self.app.profile['username'])
@@ -738,6 +742,31 @@ class TreeWindow(IconWindow):
         mtime_col.props.min_width = 100
         mtime_col.set_resizable(True)
         mtime_col.set_sort_column_id(MTIME_COL)
+
+        md5_cell = Gtk.CellRendererText()
+        md5_col = Gtk.TreeViewColumn(_('Md5'), md5_cell,
+                                     text=MD5_COL)
+        self.iconview.append_column(md5_col)
+        md5_col.props.min_width = 100
+        md5_col.set_resizable(True)
+        md5_col.set_sort_column_id(MD5_COL)
+
+        # fid_cell = Gtk.CellRendererText()
+        # fid_col = Gtk.TreeViewColumn(_('fs_id'), fid_cell,
+        #                              text=FID_COL)
+        # self.iconview.append_column(fid_col)
+        # fid_col.props.min_width = 100
+        # fid_col.set_resizable(True)
+        # fid_col.set_sort_column_id(FID_COL)
+
+        path_cell = Gtk.CellRendererText()
+        path_col = Gtk.TreeViewColumn(_('Path'), path_cell,
+                                     text=PATH_COL)
+        self.iconview.append_column(path_col)
+        path_col.props.min_width = 100
+        path_col.set_resizable(True)
+        path_col.set_sort_column_id(PATH_COL)
+
 
         # Override selection methods
         self.iconview.unselect_all = self.selection.unselect_all

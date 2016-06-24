@@ -308,6 +308,7 @@ class SigninDialog(Gtk.Dialog):
                                      callback=on_get_bdstoken)
                 # 257: 需要输入验证码
                 elif errno == 257:
+                    print("[I] >>> 需要输入验证码 : ", errno)
                     nonlocal verifycode
                     nonlocal codeString
                     vcodetype = query['vcodetype']
@@ -359,7 +360,11 @@ class SigninDialog(Gtk.Dialog):
                 nonlocal rsakey
                 rsakey = info['key']
                 nonlocal password_enc
+                print("[I] pubkey", pubkey)
+                print("[I] rsakey", rsakey)
+                print("[I] password", password)
                 password_enc = util.RSA_encrypt(pubkey, password)
+                print("[I] password_enc", password_enc)
                 gutil.async_call(auth.post_login, cookie, tokens,
                                  username, password_enc, rsakey, verifycode,
                                  codeString, callback=on_post_login)

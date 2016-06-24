@@ -33,7 +33,7 @@ def get_BAIDUID():
     '''
     url = ''.join([
         const.PASSPORT_URL,
-        '?getapi&tpl=mn&apiver=v3',
+        '?getapi&tpl=netdisk&subpro=netdisk_web&apiver=v3',
         '&tt=', util.timestamp(),
         '&class=login&logintype=basicLogin',
     ])
@@ -62,7 +62,7 @@ def get_token(cookie):
     '''
     url = ''.join([
         const.PASSPORT_URL,
-        '?getapi&tpl=pp&apiver=v3',
+        '?getapi&tpl=netdisk&apiver=v3',
         '&tt=', util.timestamp(),
         '&class=login&logintype=basicLogin',
     ])
@@ -88,7 +88,7 @@ def get_UBI(cookie, tokens):
         const.PASSPORT_URL,
         '?loginhistory',
         '&token=', tokens['token'],
-        '&tpl=pp&apiver=v3',
+        '&tpl=netdisk&apiver=v3',
         '&tt=', util.timestamp(),
     ])
     headers={
@@ -158,7 +158,7 @@ def refresh_signin_vcode(cookie, tokens, vcodetype):
         const.PASSPORT_BASE,
         'v2/?reggetcodestr',
         '&token=', tokens['token'],
-        '&tpl=pp&apiver=v3',
+        '&tpl=netdisk&apiver=v3',
         '&tt=', util.timestamp(),
         '&fr=ligin',
         '&vcodetype=', encoder.encode_uri(vcodetype),
@@ -187,7 +187,7 @@ def get_public_key(cookie, tokens):
     url = ''.join([
         const.PASSPORT_BASE, 'v2/getpublickey',
         '?token=', tokens['token'],
-        '&tpl=pp&apiver=v3&tt=', util.timestamp(),
+        '&tpl=netdisk&apiver=v3&tt=', util.timestamp(),
     ])
     headers={
         'Cookie': cookie.header_output(),
@@ -214,16 +214,25 @@ def post_login(cookie, tokens, username, password, rsakey, verifycode='',
     '''
     url = const.PASSPORT_LOGIN
     data = ''.join([
-        'staticpage=https%3A%2F%2Fpassport.baidu.com%2Fstatic%2Fpasspc-account%2Fhtml%2Fv3Jump.html',
+        'staticpage=http%3A%2F%2Fpan.baidu.com%2Fres%2Fstatic%2Fthirdparty%2Fpass_v3_jump.html',
         '&charset=UTF-8',
         '&token=', tokens['token'],
-        '&tpl=pp&subpro=&apiver=v3',
+        '&tpl=netdisk',
+        '&subpro=netdisk_web',
+        '&apiver=v3',
         '&tt=', util.timestamp(),
         '&codestring=', codestring,
-        '&safeflg=0&u=http%3A%2F%2Fpassport.baidu.com%2F',
+        '&safeflg=0',
+        '&u=http%3A%2F%2Fpan.baidu.com%2Fdisk%2Fhome',
         '&isPhone=',
-        '&quick_user=0&logintype=basicLogin&logLoginType=pc_loginBasic&idc=',
+        '&detect=1',
+        '&gid=11AF23A-C4FA-4B81-A28E-3B15754E9194',
+        '&quick_user=0',
+        '&logintype=basicLogin',
+        '&logLoginType=pc_loginBasic',
+        '&idc=',
         '&loginmerge=true',
+        '&foreignusername=',
         '&username=', encoder.encode_uri_component(username),
         '&password=', encoder.encode_uri_component(password),
         '&verifycode=', verifycode,
@@ -231,12 +240,15 @@ def post_login(cookie, tokens, username, password, rsakey, verifycode='',
         '&rsakey=', rsakey,
         '&crypttype=12',
         '&ppui_logintime=',get_ppui_logintime(),
-        '&callback=parent.bd__pcbs__28g1kg',
+        '&countrycode=',
+        '&callback=parent.bd__pcbs__4qhckd',
     ])
     headers={
         'Accept': const.ACCEPT_HTML,
-        'Cookie': cookie.sub_output('BAIDUID','HOSUPPORT', 'UBI'),
+        'Cookie': cookie.sub_output('BAIDUID', 'HOSUPPORT', 'UBI'),
         'Referer': const.REFERER,
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Upgrade-Insecure-Requests': '1',
         'Connection': 'Keep-Alive',
     }
     req = net.urlopen(url, headers=headers, data=data.encode())
@@ -250,6 +262,8 @@ def post_login(cookie, tokens, username, password, rsakey, verifycode='',
         err_no = query['err_no']
         auth_cookie = req.headers.get_all('Set-Cookie')
 
+        print("[!]query : ", query)
+
         if err_no == 0:
             return (0, auth_cookie)
         # #!! not bind cellphone
@@ -257,11 +271,17 @@ def post_login(cookie, tokens, username, password, rsakey, verifycode='',
             return (0, auth_cookie)
         # 要输入验证码
         elif err_no == 257:
+            print("[T]>>>>>>>>> ", err_no)
             return (err_no, query)
         # 需要短信验证
+        elif err_no == 9:
+            print("[E] 密码加密可能是是空.你的加密密码是[", password, "],如果为空")
+            print("[E] 请检查是否安装了Pycrypto. [pip3 install Pycrypto]")
+            return (err_no, query)
         elif err_no == 400031:
             return (err_no, query)
         else:
+            print("[!]error : ", err_no)
             return (err_no, None)
     else:
         return (-1, None)
@@ -289,6 +309,7 @@ def get_bdstoken(cookie):
     '''
     url = const.PAN_REFERER
     req = net.urlopen(url, headers={'Cookie': cookie.header_output()})
+    cookie.load_list(req.headers.get_all('Set-Cookie'))
     if req:
         return parse_bdstoken(req.data.decode())
     else:
