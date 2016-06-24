@@ -114,7 +114,6 @@ def list_share_files(cookie, tokens, uk, shareid, dirname, page=1):
                这里, 需要调用list_share_single_file()
     '''
 
-    print("[I]list_share_files : ", dirname)
     if not dirname:
         return list_share_single_file(cookie, tokens, uk, shareid)
     url = ''.join([
@@ -151,14 +150,12 @@ def list_share_single_file(cookie, tokens, uk, shareid):
     def parse_share_page(content):
         # tree = html.fromstring(content)
         # script_sel = CSS('script')
-        # print("[I]script_sel:", script_sel)
         # scripts = script_sel(tree)
         # for script in scripts:
         #     if (script.text and (script.text.find('viewsingle_param') > -1 or
         #         script.text.find('mpan.viewlist_param') > -1)):
         #         break
         # else:
-        #     print("[I]no found script")
         #     logger.warn('pcs.parse_share_page: failed to get filelist, %s', url)
         #     return None
         # start = script.text.find('viewsingle_param.list=JSON.parse(')
@@ -187,7 +184,6 @@ def list_share_single_file(cookie, tokens, uk, shareid):
                     json_match.group(1),
                     "}"
                 ])
-                print("[I]json_str :", json_str)
                 return json.loads(json_str)['file_list']
             except ValueError:
                 logger.warn(traceback.format_exc())
@@ -201,7 +197,6 @@ def list_share_single_file(cookie, tokens, uk, shareid):
         '&uk=', uk,
         '&third=0',
     ])
-    print("[I] list_share_single_file : ", url)
     req = net.urlopen(url, headers={
         'Cookie': cookie.header_output(),
         'Referer': const.SHARE_REFERER,
@@ -263,7 +258,6 @@ def enable_private_share(cookie, tokens, fid_list, passwd='smfx'):
 
     密码是在本地生成的, 然后上传到服务器.
     '''
-    print('enable private share:', fid_list, cookie, tokens)
     url = ''.join([
         const.PAN_URL,
         'share/set?channel=chunlei&clienttype=0&web=1',
@@ -271,13 +265,11 @@ def enable_private_share(cookie, tokens, fid_list, passwd='smfx'):
         '&channel=chunlei&clienttype=0&web=1',
         '&appid=250528',
     ])
-    print('url:', url)
     data = encoder.encode_uri(''.join([
         'fid_list=', str(fid_list),
         '&schannel=4&channel_list=[]',
         '&pwd=', passwd,
         ]))
-    print('data:', data)
     req = net.urlopen(url, headers={
         'Cookie': cookie.header_output(),
         'Content-type': const.CONTENT_FORM_UTF8,
@@ -343,34 +335,28 @@ def get_share_uk_and_shareid(cookie, url):
             return None
 
     def parse_uk_from_url(url):
-        print("[I]parse_uk_from_url", url)
         uk_reg = re.compile('uk=(\d+)')
         uk_match = uk_reg.search(url)
         shareid_reg = re.compile('shareid=(\d+)')
         shareid_match = shareid_reg.search(url)
-        print("[I]parse_uk_from_url:", uk_match, shareid_match)
         if not uk_match or not shareid_match:
             return '', ''
         uk = uk_match.group(1)
         shareid = shareid_match.group(1)
-        print("[I]parse_uk_from_url:", uk, shareid)
         return uk, shareid
 
-    print("get_share_uk_and_shareid ..........", url)
     # 识别加密链接
     req = net.urlopen_without_redirect(url, headers={
         'Cookie': cookie.header_output(),
     })
     if req and req.headers.get('Location'):
         init_url = req.headers.get('Location')
-        print("[I]init_url : ", init_url)
         if init_url.find('share/init') > -1:
             uk, shareid = parse_uk_from_url(init_url)
             return True, uk, shareid
 
     # 处理短链接
     if url.startswith('http://pan.baidu.com/s/'):
-        print("[I]短链接", url)
         req = net.urlopen(url, headers={
             'Cookie': cookie.header_output(),
         })

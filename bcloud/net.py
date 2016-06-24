@@ -89,9 +89,9 @@ def urlopen(url, headers={}, data=None, retries=RETRIES, timeout=TIMEOUT):
     opener = urllib.request.build_opener(ForbiddenHandler)
     opener.addheaders = [(k, v) for k,v in headers_merged.items()]
 
-    print("[*] url : ", url)
-    print("[*] headers : ", headers)
-    print("[*] data : ", data)
+    # print("[*] url : ", url)
+    # print("[*] headers : ", headers)
+    # print("[*] data : ", data)
 
     for i in range(retries):
         try:
@@ -103,8 +103,8 @@ def urlopen(url, headers={}, data=None, retries=RETRIES, timeout=TIMEOUT):
             elif encoding == 'deflate':
                 req.data = zlib.decompress(req.data, -zlib.MAX_WBITS)
 
-            print("[*] req.data : ", req.data)
-            print("[*] req.headers : ", req.headers)
+            # print("[*] req.data : ", req.data)
+            # print("[*] req.headers : ", req.headers)
             return req
         except OSError:
             logger.error(traceback.format_exc())

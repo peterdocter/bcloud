@@ -156,7 +156,8 @@ def RSA_encrypt(public_key, message):
     '''
     # 如果没能成功导入RSA模块, 就直接返回空白字符串.
     if not globals().get('RSA'):
-        print("[E] get('RSA') faild")
+        logger.error("[E] load RSA Model faild. Please check Pycrypto model has installed")
+        logger.error("[E] pip3 install Pycrypto")
         return ''
     rsakey = RSA.importKey(public_key)
     rsakey = PKCS1_v1_5.new(rsakey)

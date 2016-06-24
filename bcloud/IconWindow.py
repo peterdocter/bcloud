@@ -623,7 +623,6 @@ class IconWindow(Gtk.ScrolledWindow):
 
     def on_private_share_activated(self, menu_item):
         def on_share(info, error=None):
-            print('on share:', info, error)
             if error or not info or info[0]['errno'] != 0:
                 logger.error('IconWindow.on_private_share_activated: %s, %s' %
                              (info, error))
@@ -631,9 +630,6 @@ class IconWindow(Gtk.ScrolledWindow):
                 return
 
             file_info, passwd = info
-            print('info :', info)
-            print('file_info:', file_info['shorturl'])
-            print('passwd:', passwd)
 
             tipInfo = "".join([
                 "链接: ",
@@ -652,7 +648,6 @@ class IconWindow(Gtk.ScrolledWindow):
             pcs_file = self.get_pcs_file(tree_path)
             fid_list.append(pcs_file['fs_id'])
             privatePwd = self.getPrivateSharePwd(_("请输入4位的分享密码(可以是一个数字或字母加一个中文哦)"), _("分享密码"))
-            print("[I] privatePwd is ", privatePwd)
             if privatePwd is None:
                 return
             # if len(privatePwd) is not 4:

@@ -262,8 +262,6 @@ def post_login(cookie, tokens, username, password, rsakey, verifycode='',
         err_no = query['err_no']
         auth_cookie = req.headers.get_all('Set-Cookie')
 
-        print("[!]query : ", query)
-
         if err_no == 0:
             return (0, auth_cookie)
         # #!! not bind cellphone
@@ -271,17 +269,11 @@ def post_login(cookie, tokens, username, password, rsakey, verifycode='',
             return (0, auth_cookie)
         # 要输入验证码
         elif err_no == 257:
-            print("[T]>>>>>>>>> ", err_no)
             return (err_no, query)
         # 需要短信验证
-        elif err_no == 9:
-            print("[E] 密码加密可能是是空.你的加密密码是[", password, "],如果为空")
-            print("[E] 请检查是否安装了Pycrypto. [pip3 install Pycrypto]")
-            return (err_no, query)
         elif err_no == 400031:
             return (err_no, query)
         else:
-            print("[!]error : ", err_no)
             return (err_no, None)
     else:
         return (-1, None)
