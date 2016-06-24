@@ -780,10 +780,10 @@ class TreeWindow(IconWindow):
         name_col.pack_start(icon_cell, False)
         name_col.pack_start(name_cell, True)
         if Config.GTK_LE_36:
-            name_col.add_attribute(icon_cell, 'pixbuf', PIXBUF_COL, FOREGROUND_COLOR)
+            name_col.add_attribute(icon_cell, 'pixbuf', PIXBUF_COL)
             name_col.add_attribute(name_cell, 'text', NAME_COL, FOREGROUND_COLOR)
         else:
-            name_col.set_attributes(icon_cell, pixbuf=PIXBUF_COL, foreground=FOREGROUND_COLOR)
+            name_col.set_attributes(icon_cell, pixbuf=PIXBUF_COL)
             name_col.set_attributes(name_cell, text=NAME_COL, foreground=FOREGROUND_COLOR)
         name_col.set_expand(True)
         name_col.set_resizable(True)
