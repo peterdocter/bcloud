@@ -83,16 +83,16 @@ DEFAULT_PROFILE = {
     'sync-dir': Config.HOME_DIR,
     'dest-sync-dir': '/',
 
-    # 保存的视图模式
+    # 保存的视图模式, 默认为列表模式
     'view-mode': {
-        'HomePage': 0,
-        'CategoryPage': 0,
-        'BTPage': 0,
-        'OtherPage': 0,
-        'DocPage': 0,
-        'PicturePage': 0,
-        'MusicPage': 0,
-        'VideoPage': 0,
+        'HomePage': 1,
+        'CategoryPage': 1,
+        'BTPage': 1,
+        'OtherPage': 1,
+        'DocPage': 1,
+        'PicturePage': 1,
+        'MusicPage': 1,
+        'VideoPage': 1,
     },
 }
 RETRIES = 3   # 调用keyring模块与libgnome-keyring交互的尝试次数
