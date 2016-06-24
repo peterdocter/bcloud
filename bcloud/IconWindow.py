@@ -33,8 +33,8 @@ from bcloud import encoder
 
 (PIXBUF_COL, NAME_COL, PATH_COL, TOOLTIP_COL, SIZE_COL, HUMAN_SIZE_COL,
     ISDIR_COL, MTIME_COL, HUMAN_MTIME_COL, TYPE_COL, PCS_FILE_COL,
-    FID_COL, MD5_COL, FOREGROUND_COLOR) = list(
-            range(14))
+    FID_COL, MD5_COL, FOREGROUND_COLOR, COUNT_COL) = list(
+            range(15))
 TYPE_TORRENT = 'application/x-bittorrent'
 
 DRAG_TARGETS = (
@@ -66,12 +66,12 @@ class IconWindow(Gtk.ScrolledWindow):
 
         # pixbuf, name, path, tooltip, size, humansize,
         # isdir, mtime, human mtime, type, pcs_file,
-        # fs_id, md5, foregroundColor
+        # fs_id, md5, foregroundColor, count
         self.liststore = Gtk.ListStore(GdkPixbuf.Pixbuf, str, str, str,
                                        GObject.TYPE_INT64, str,
                                        GObject.TYPE_INT, GObject.TYPE_INT64,
                                        str, str, str,
-                                       GObject.TYPE_INT64, str, str)
+                                       GObject.TYPE_INT64, str, str, int)
         self.init_ui()
 
     def init_ui(self):
@@ -131,9 +131,11 @@ class IconWindow(Gtk.ScrolledWindow):
             if pcs_file['isdir']:
                 human_size = '--'
                 foregroundColor = "#3a5d96"
+                count = 0
             else:
                 human_size = util.get_human_size(pcs_file['size'])[0]
-                if md5Dict[md5] > 1:
+                count = md5Dict[md5]
+                if count > 1:
                     foregroundColor = "#ff5050"
                 else:
                     foregroundColor = "#2e2e2e"
@@ -144,7 +146,7 @@ class IconWindow(Gtk.ScrolledWindow):
             tree_iter = self.liststore.append([
                 pixbuf, name, path, tooltip, size, human_size,
                 pcs_file['isdir'], mtime, human_mtime, type_,
-                json.dumps(pcs_file), fid, md5, foregroundColor
+                json.dumps(pcs_file), fid, md5, foregroundColor, count
             ])
             tree_iters.append(tree_iter)
 
@@ -817,9 +819,17 @@ class TreeWindow(IconWindow):
         md5_col.set_resizable(True)
         md5_col.set_sort_column_id(MD5_COL)
 
+        count_cell = Gtk.CellRendererText()
+        count_col = Gtk.TreeViewColumn(_('Count'), count_cell,
+                                     text=COUNT_COL, foreground=FOREGROUND_COLOR)
+        self.iconview.append_column(count_col)
+        count_col.props.min_width = 100
+        count_col.set_resizable(True)
+        count_col.set_sort_column_id(COUNT_COL)
+
         # fid_cell = Gtk.CellRendererText()
         # fid_col = Gtk.TreeViewColumn(_('fs_id'), fid_cell,
-        #                              text=FID_COL)
+        #                              text=FID_COL, foreground=FOREGROUND_COLOR)
         # self.iconview.append_column(fid_col)
         # fid_col.props.min_width = 100
         # fid_col.set_resizable(True)
