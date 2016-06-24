@@ -29,6 +29,7 @@ from bcloud import gutil
 from bcloud.log import logger
 from bcloud import pcs
 from bcloud import util
+from bcloud import encoder
 
 (PIXBUF_COL, NAME_COL, PATH_COL, TOOLTIP_COL, SIZE_COL, HUMAN_SIZE_COL,
     ISDIR_COL, MTIME_COL, HUMAN_MTIME_COL, TYPE_COL, PCS_FILE_COL, FID_COL, MD5_COL) = list(
@@ -572,6 +573,34 @@ class IconWindow(Gtk.ScrolledWindow):
             gutil.async_call(pcs.enable_share, self.app.cookie, self.app.tokens,
                              fid_list, callback=on_share)
 
+    def getPrivateSharePwd(self, message, title=''):
+        # Returns user input as a string or None
+        # If user does not input text it returns None, NOT AN EMPTY STRING.
+        dialogWindow = Gtk.MessageDialog(self.app.window,
+                                         Gtk.DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                                         Gtk.MessageType.QUESTION,
+                                         Gtk.ButtonsType.OK_CANCEL,
+                                         message)
+
+        dialogWindow.set_title(title)
+
+        dialogBox = dialogWindow.get_content_area()
+        userEntry = Gtk.Entry()
+        # userEntry.set_visibility(False)
+        # userEntry.set_invisible_char("*")
+        userEntry.set_max_length(4)
+        userEntry.set_size_request(255, 0)
+        dialogBox.pack_end(userEntry, False, False, 0)
+
+        dialogWindow.show_all()
+        response = dialogWindow.run()
+        text = userEntry.get_text()
+        dialogWindow.destroy()
+        if (response == Gtk.ResponseType.OK) and (text != ''):
+            return text
+        else:
+            return None
+
     def on_private_share_activated(self, menu_item):
         def on_share(info, error=None):
             print('on share:', info, error)
@@ -602,8 +631,16 @@ class IconWindow(Gtk.ScrolledWindow):
         for tree_path in tree_paths:
             pcs_file = self.get_pcs_file(tree_path)
             fid_list.append(pcs_file['fs_id'])
+            privatePwd = self.getPrivateSharePwd(_("请输入4位的分享密码(可以是一个数字或字母加一个中文哦)"), _("分享密码"))
+            print("[I] privatePwd is ", privatePwd)
+            if privatePwd is None:
+                return
+            # if len(privatePwd) is not 4:
+            #     self.app.toast("密码长度不是4位!")
+            #     return
+
             gutil.async_call(pcs.enable_private_share, self.app.cookie,
-                             self.app.tokens, fid_list, callback=on_share)
+                             self.app.tokens, fid_list, privatePwd, callback=on_share)
 
     def on_moveto_activated(self, menu_item):
         tree_paths = self.iconview.get_selected_items()
