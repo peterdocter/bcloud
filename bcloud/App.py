@@ -454,9 +454,16 @@ class App:
         menu.show_all()
         self.status_menu = menu
 
+        svgPath = Config.NAME
+        path = 'share/bcloud/icons/hicolor/scalable/apps/bcloud.svg'
+        if os.path.isfile(os.path.abspath(path)):
+            svgPath = os.path.abspath(path)
+        elif os.path.isfile('/'+path):
+            svgPath = '/'+path
+
         if 'AppIndicator' in globals():
             self.status_icon = AppIndicator.Indicator.new(Config.NAME,
-                    Config.NAME,
+                    svgPath,
                     AppIndicator.IndicatorCategory.APPLICATION_STATUS)
             self.status_icon.set_menu(menu)
             self.status_icon.set_status(AppIndicator.IndicatorStatus.ACTIVE)
