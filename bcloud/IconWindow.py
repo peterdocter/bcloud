@@ -32,8 +32,9 @@ from bcloud import util
 from bcloud import encoder
 
 (PIXBUF_COL, NAME_COL, PATH_COL, TOOLTIP_COL, SIZE_COL, HUMAN_SIZE_COL,
-    ISDIR_COL, MTIME_COL, HUMAN_MTIME_COL, TYPE_COL, PCS_FILE_COL, FID_COL, MD5_COL) = list(
-            range(13))
+    ISDIR_COL, MTIME_COL, HUMAN_MTIME_COL, TYPE_COL, PCS_FILE_COL,
+    FID_COL, MD5_COL, FOREGROUND_COLOR) = list(
+            range(14))
 TYPE_TORRENT = 'application/x-bittorrent'
 
 DRAG_TARGETS = (
@@ -65,12 +66,12 @@ class IconWindow(Gtk.ScrolledWindow):
 
         # pixbuf, name, path, tooltip, size, humansize,
         # isdir, mtime, human mtime, type, pcs_file,
-        # fs_id, md5
+        # fs_id, md5, foregroundColor
         self.liststore = Gtk.ListStore(GdkPixbuf.Pixbuf, str, str, str,
                                        GObject.TYPE_INT64, str,
                                        GObject.TYPE_INT, GObject.TYPE_INT64,
                                        str, str, str,
-                                       GObject.TYPE_INT64, str)
+                                       GObject.TYPE_INT64, str, str)
         self.init_ui()
 
     def init_ui(self):
@@ -109,6 +110,15 @@ class IconWindow(Gtk.ScrolledWindow):
         文件的path都被提取出来, 然后放到了一个list中.
         '''
         tree_iters = []
+
+        md5Dict = {}
+        for pcs_file in pcs_files:
+            md5 = pcs_file.get('md5', "")
+            if md5 in md5Dict:
+                md5Dict[md5] += 1
+            else:
+                md5Dict[md5] = 1
+
         for pcs_file in pcs_files:
             path = pcs_file['path']
             pixbuf, type_ = self.app.mime.get(path, pcs_file['isdir'],
@@ -116,20 +126,28 @@ class IconWindow(Gtk.ScrolledWindow):
             name = os.path.split(path)[NAME_COL]
             tooltip = gutil.escape(name)
             size = pcs_file.get('size', 0)
+            md5 = pcs_file.get('md5', "")
+
             if pcs_file['isdir']:
                 human_size = '--'
+                foregroundColor = "#3a5d96"
             else:
                 human_size = util.get_human_size(pcs_file['size'])[0]
+                if md5Dict[md5] > 1:
+                    foregroundColor = "#ff5050"
+                else:
+                    foregroundColor = "#2e2e2e"
             mtime = pcs_file.get('server_mtime', 0)
             human_mtime = time.ctime(mtime)
             fid = pcs_file.get('fs_id', 0)
-            md5 = pcs_file.get('md5', "")
+
             tree_iter = self.liststore.append([
                 pixbuf, name, path, tooltip, size, human_size,
                 pcs_file['isdir'], mtime, human_mtime, type_,
-                json.dumps(pcs_file), fid, md5
+                json.dumps(pcs_file), fid, md5, foregroundColor
             ])
             tree_iters.append(tree_iter)
+
         cache_path = Config.get_cache_path(self.app.profile['username'])
         gutil.async_call(gutil.update_liststore_image, self.liststore,
                          tree_iters, PIXBUF_COL, pcs_files, cache_path,
@@ -765,11 +783,11 @@ class TreeWindow(IconWindow):
         name_col.pack_start(icon_cell, False)
         name_col.pack_start(name_cell, True)
         if Config.GTK_LE_36:
-            name_col.add_attribute(icon_cell, 'pixbuf', PIXBUF_COL)
-            name_col.add_attribute(name_cell, 'text', NAME_COL)
+            name_col.add_attribute(icon_cell, 'pixbuf', PIXBUF_COL, FOREGROUND_COLOR)
+            name_col.add_attribute(name_cell, 'text', NAME_COL, FOREGROUND_COLOR)
         else:
-            name_col.set_attributes(icon_cell, pixbuf=PIXBUF_COL)
-            name_col.set_attributes(name_cell, text=NAME_COL)
+            name_col.set_attributes(icon_cell, pixbuf=PIXBUF_COL, foreground=FOREGROUND_COLOR)
+            name_col.set_attributes(name_cell, text=NAME_COL, foreground=FOREGROUND_COLOR)
         name_col.set_expand(True)
         name_col.set_resizable(True)
         self.iconview.append_column(name_col)
@@ -777,7 +795,7 @@ class TreeWindow(IconWindow):
         self.liststore.set_sort_func(NAME_COL, gutil.tree_model_natsort)
 
         size_cell = Gtk.CellRendererText()
-        size_col = Gtk.TreeViewColumn(_('Size'), size_cell, text=HUMAN_SIZE_COL)
+        size_col = Gtk.TreeViewColumn(_('Size'), size_cell, text=HUMAN_SIZE_COL, foreground=FOREGROUND_COLOR)
         self.iconview.append_column(size_col)
         size_col.props.min_width = 100
         size_col.set_resizable(True)
@@ -785,7 +803,7 @@ class TreeWindow(IconWindow):
 
         mtime_cell = Gtk.CellRendererText()
         mtime_col = Gtk.TreeViewColumn(_('Modified'), mtime_cell,
-                                       text=HUMAN_MTIME_COL)
+                                       text=HUMAN_MTIME_COL, foreground=FOREGROUND_COLOR)
         self.iconview.append_column(mtime_col)
         mtime_col.props.min_width = 100
         mtime_col.set_resizable(True)
@@ -793,7 +811,7 @@ class TreeWindow(IconWindow):
 
         md5_cell = Gtk.CellRendererText()
         md5_col = Gtk.TreeViewColumn(_('Md5'), md5_cell,
-                                     text=MD5_COL)
+                                     text=MD5_COL, foreground=FOREGROUND_COLOR)
         self.iconview.append_column(md5_col)
         md5_col.props.min_width = 100
         md5_col.set_resizable(True)
@@ -809,7 +827,7 @@ class TreeWindow(IconWindow):
 
         path_cell = Gtk.CellRendererText()
         path_col = Gtk.TreeViewColumn(_('Path'), path_cell,
-                                     text=PATH_COL)
+                                     text=PATH_COL, foreground=FOREGROUND_COLOR)
         self.iconview.append_column(path_col)
         path_col.props.min_width = 100
         path_col.set_resizable(True)
