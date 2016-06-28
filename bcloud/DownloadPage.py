@@ -558,6 +558,10 @@ class DownloadPage(Gtk.Box):
                                row[NAME_COL]))
             self.scan_tasks()
 
+            if row[STATE_COL] == State.ERROR:
+                # 网络错误,不停的重置开始
+                self.restart_task(row)
+
         def do_worker_disk_error(fs_id, tmp_filepath):
             # do not retry on disk-error
             self.app.toast(_('Disk Error: failed to read/write {0}').format(
@@ -602,6 +606,7 @@ class DownloadPage(Gtk.Box):
         当指定的下载任务出现错误时(通常是网络连接超时), 如果用户允许, 就会在
         指定的时间间隔之后, 重启这个任务.
         '''
+        self.stop_worker(row)
         self.start_task(row)
 
     def start_task(self, row, scan=True):

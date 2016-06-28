@@ -69,7 +69,8 @@ class DownloadBatch(threading.Thread):
         content_range = 'bytes={0}-{1}'.format(start_size, end_size)
         opener.addheaders = [
             ('Range', content_range),
-            ('User-Agent', const.USER_AGENT),
+            # ('User-Agent', const.USER_AGENT),
+            ('User-Agent', const.PC_USER_AGENT),    #1G文件下到90%中断无法继续,用PC版本的居然可以继续下载了
             ('Referer', const.PAN_REFERER),
         ]
         for i in range(RETRIES):
