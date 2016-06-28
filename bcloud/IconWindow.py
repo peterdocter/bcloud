@@ -728,6 +728,9 @@ class IconWindow(Gtk.ScrolledWindow):
         self.app.blink_page(self.app.trash_page)
         self.app.trash_page.reload()
 
+    def key_delete_activated(self):
+        self.on_trash_activated(None)
+
     def on_props_activated(self, menu_item):
         '''显示选中的文件或者当前目录的属性'''
         tree_paths = self.iconview.get_selected_items()

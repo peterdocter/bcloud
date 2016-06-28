@@ -225,6 +225,18 @@ class HomePage(Gtk.Box):
                                      self.on_grid_view_button_clicked)
             right_box.pack_start(grid_view_button, False, False, 0)
 
+            # Delete button
+            delete_button = Gtk.Button()
+            delete_img = Gtk.Image.new_from_icon_name('user-trash-symbolic',
+                                                      Gtk.IconSize.SMALL_TOOLBAR)
+            delete_button.set_image(delete_img)
+            delete_button.set_tooltip_text(_('Delete'))
+            delete_button.connect('clicked', self.delete)
+            self.headerbar.pack_end(delete_button)
+            key, mod = Gtk.accelerator_parse('Delete')
+            delete_button.add_accelerator('clicked',
+                                          self.app.accel_group, key, mod, Gtk.AccelFlags.VISIBLE)
+
             # reload button
             reload_button = Gtk.Button()
             reload_img = Gtk.Image.new_from_icon_name('view-refresh-symbolic',
@@ -390,6 +402,10 @@ class HomePage(Gtk.Box):
         self.loading_spin.show_all()
         gutil.async_call(pcs.list_dir, self.app.cookie, self.app.tokens,
                          self.path, self.page_num, callback=on_load_next)
+
+    def delete(self, *args, **kwds):
+        '''移除选择项'''
+        self.icon_window.key_delete_activated()
 
     def reload(self, *args, **kwds):
         '''重新载入本页面'''
