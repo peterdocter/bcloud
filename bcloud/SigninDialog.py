@@ -319,7 +319,9 @@ class SigninDialog(Gtk.Dialog):
                     verifycode = dialog.get_vcode()
                     codeString = dialog.codeString
                     dialog.destroy()
-                    if not verifycode or len(verifycode) != 4:
+                    # 中文验证码是2个,不再做长度检验
+                    # if not verifycode or len(verifycode) != 4:
+                    if not verifycode:
                         self.signin_failed(_('Please input verification code!'))
                         return
                     else:
